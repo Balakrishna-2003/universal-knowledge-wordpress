@@ -1,0 +1,2 @@
+wp-content/themes/custom-child-theme/assets/pdf/e-letter-pdf/June-2024.pdf filter=lfs diff=lfs merge=lfs -text
+*.pdf filter=lfs diff=lfs merge=lfs -text
