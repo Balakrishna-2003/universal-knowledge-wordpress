@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-         <title><?php echo esc_html( get_the_title() ); ?> | Universal Knowledge Trust</title>
+     <title>
+         <?php 
+            if ( is_front_page() ) {
+                echo 'Home | Universal Knowledge Trust';
+                } else {
+                    echo esc_html( get_the_title() ) . ' | Universal Knowledge Trust';
+                    }
+                    ?>
+    </title>
      <link rel="shortcut icon" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/favicon.png">
     <meta name="theme-color" content="#27872e" >
     <link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/css/bootstrap.min.css">

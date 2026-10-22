@@ -8,7 +8,7 @@ switch ($page_slug) {
          E-LETTERS BANNER / HERO SECTION
          (Matches index.html showcase hero layout)
     ========================================================== -->
-<section class="ukt-hero-showcase">
+    <section class="ukt-hero-showcase">
         <div class="ukt-hero-slide-layout">
             <div class="container-fluid">
                 <div class="row g-0 align-items-stretch">
@@ -273,6 +273,157 @@ switch ($page_slug) {
         </div>
     </section>
     <?php
+        break;
+
+    case 'reviews-on-website':
+        ?>
+        <!-- =========================================================
+         PRESS RELEASE BANNER / HERO SECTION
+    ========================================================== -->
+    <section class="ukt-hero-showcase">
+        <div class="ukt-hero-carousel-shell">
+            <div class="carousel-inner">
+                <div class="carousel-item active ukt-hero-carousel-item">
+                    <div class="ukt-hero-slide-layout">
+                        <div class="container-fluid">
+                            <div class="row g-0 align-items-stretch">
+
+                                <!-- LEFT CONTENT AREA -->
+                                <div class="col-lg-6 col-xl-5 d-flex align-items-center">
+                                    <div class="ukt-hero-copy-zone">
+                                        <div class="ukt-hero-left-decoration"></div>
+
+                                        <div class="ukt-hero-slide-kicker">
+                                            <i class="bi bi-chat-quote-fill me-1 ukt-text-green"></i>
+                                            Universal Knowledge Trust • Reviews &amp; Testimonials
+                                        </div>
+
+                                        <h1 class="ukt-hero-main-title">
+                                            <span>Reviews on</span>
+                                            <span>Website</span>
+                                        </h1>
+
+                                        <div class="ukt-hero-script-line">
+                                            Voices of Transformation · Real Experiences
+                                        </div>
+
+                                        <p class="ukt-hero-description">
+                                            Read inspiring testimonials and heartfelt experiences shared by seekers,
+                                            parents, educators, and participants whose lives have been deeply
+                                            touched by Universal Knowledge Trust's healing sessions, workshops, and
+                                            spiritual guidance.
+                                        </p>
+
+                                        <div class="ukt-hero-action-row">
+                                            <a href="#reviews" class="ukt-hero-primary-action">
+                                                Read Reviews
+                                                <i class="bi bi-arrow-down-circle"></i>
+                                            </a>
+                                            <a href="#submit-review" class="ukt-hero-secondary-action">
+                                                <i class="bi bi-chat-dots-fill me-1"></i> Share Your Review
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- RIGHT IMAGE AREA -->
+                                <div class="col-lg-6 col-xl-7">
+                                    <div class="ukt-hero-visual-zone">
+                                        <div class="ukt-hero-image-frame">
+                                            <figure class="ukt-figure-fill">
+                                                <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/reviews-on-website-banner.jpg"
+                                                    alt="Reviews on Website - Universal Knowledge Trust - Voices of Transformation"
+                                                    loading="eager">
+                                                <figcaption class="visually-hidden">Reviews on Website - Universal
+                                                    Knowledge Trust Hero Banner</figcaption>
+                                            </figure>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php
+        break;
+    
+    case 'video-testimonials':
+        ?>
+        <!-- =========================================================
+             PROGRAM TESTIMONIALS BANNER / HERO SECTION
+             (Matches index.html showcase hero layout & spacing)
+        ========================================================== -->
+        <section class="ukt-hero-showcase">
+            <div class="ukt-hero-carousel-shell">
+                <div class="carousel-inner">
+                    <div class="carousel-item active ukt-hero-carousel-item">
+                        <div class="ukt-hero-slide-layout">
+                            <div class="container-fluid">
+                                <div class="row g-0 align-items-stretch">
+
+                                    <!-- LEFT CONTENT AREA -->
+                                    <div class="col-lg-6 col-xl-5 d-flex align-items-center">
+                                        <div class="ukt-hero-copy-zone">
+                                            <div class="ukt-hero-left-decoration"></div>
+
+                                            <div class="ukt-hero-slide-kicker">
+                                                <i class="bi bi-camera-reels-fill me-1 ukt-text-green"></i>
+                                                Universal Knowledge Trust • Video Testimonials
+                                            </div>
+
+                                            <h1 class="ukt-hero-main-title">
+                                                <span>Video</span>
+                                                <span>Testimonials</span>
+                                            </h1>
+
+                                            <div class="ukt-hero-script-line">
+                                                Voices of Transformation · Real Experiences
+                                            </div>
+
+                                            <p class="ukt-hero-description">
+                                                Watch inspiring video testimonials, participant reflections, and heartfelt retreat feedback shared by seekers whose lives have been deeply transformed through Universal Knowledge Trust.
+                                            </p>
+
+                                            <!-- <div class="ukt-hero-action-row">
+                                                <a href="#inner-growth-2023" class="ukt-hero-primary-action">
+                                                    Watch Testimonials
+                                                    <i class="bi bi-play-circle ms-1"></i>
+                                                </a>
+                                                <a href="#uk-retreat-2022" class="ukt-hero-secondary-action">
+                                                    <i class="bi bi-collection-play me-1"></i> Explore Series
+                                                </a>
+                                            </div> -->
+
+                                        </div>
+                                    </div>
+
+                                    <!-- RIGHT IMAGE AREA -->
+                                    <div class="col-lg-6 col-xl-7">
+                                        <div class="ukt-hero-visual-zone">
+                                            <div class="ukt-hero-image-frame">
+                                                <figure class="ukt-figure-fill">
+                                                    <img src="<?php echo get_stylesheet_directory_uri();?>/assets/images/video-testimonials-banner.jpg"
+                                                        alt="Video Testimonials - Universal Knowledge Trust - Voices of Transformation"
+                                                        loading="eager">
+                                                    <figcaption class="visually-hidden">Video Testimonials - Universal Knowledge Trust Hero Banner</figcaption>
+                                                </figure>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <?php
         break;
     
     default:

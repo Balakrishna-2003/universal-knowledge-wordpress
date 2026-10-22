@@ -43,10 +43,12 @@ ROOT
 
 html {
     scroll-behavior: smooth;
+    margin: 0px;
 }
 
 body {
-    margin: 0;
+    margin: 0px;
+    padding: 0px;
 
     font-family:
         "Poppins",

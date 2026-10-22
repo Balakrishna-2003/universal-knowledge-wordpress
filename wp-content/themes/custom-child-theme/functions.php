@@ -1328,3 +1328,557 @@ function ukt_get_ba_gifts($page_slug = 'books-and-articles') {
     if (!$page) return [];
     return get_post_meta($page->ID, '_ukt_ba_gifts', true) ?: [];
 }
+
+
+/* =========================================================
+   1. REGISTER 'REVIEW' CUSTOM POST TYPE
+========================================================= */
+add_action('init', 'ukt_register_review_cpt');
+function ukt_register_review_cpt() {
+    register_post_type('ukt_review', array(
+        'labels' => array(
+            'name'          => 'Reviews',
+            'singular_name' => 'Review',
+            'menu_name'     => 'Reviews',
+        ),
+        'public'       => false,
+        'show_ui'      => true,
+        'menu_icon'    => 'dashicons-star-filled',
+        'supports'     => array('title', 'editor'), // Title = Name, Editor = Review Text
+    ));
+}
+
+/* =========================================================
+   2. HANDLE AJAX FORM SUBMISSION
+========================================================= */
+add_action('wp_ajax_submit_ukt_review', 'ukt_handle_review_submission');
+add_action('wp_ajax_nopriv_submit_ukt_review', 'ukt_handle_review_submission');
+
+function ukt_handle_review_submission() {
+    // Security check
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ukt_review_nonce')) {
+        wp_send_json_error(array('message' => 'Security check failed.'));
+    }
+
+    // Sanitize inputs
+    $name     = sanitize_text_field($_POST['name']);
+    $email    = sanitize_email($_POST['email']);
+    $phone    = sanitize_text_field($_POST['phone']);
+    $healer   = sanitize_text_field($_POST['healer']);
+    $program  = sanitize_text_field($_POST['program']);
+    $rating   = intval($_POST['rating']);
+    $review   = sanitize_textarea_field($_POST['review']);
+
+    if (empty($name) || empty($review)) {
+        wp_send_json_error(array('message' => 'Name and Review are required.'));
+    }
+
+    // Create the new Review Post
+    $post_id = wp_insert_post(array(
+        'post_type'    => 'ukt_review',
+        'post_status'  => 'publish',
+        'post_title'   => $name,
+        'post_content' => $review,
+    ));
+
+    if (is_wp_error($post_id)) {
+        wp_send_json_error(array('message' => 'Failed to save review.'));
+    }
+
+    // Save the meta data
+    update_post_meta($post_id, '_ukt_email', $email);
+    update_post_meta($post_id, '_ukt_phone', $phone);
+    update_post_meta($post_id, '_ukt_healer', $healer);
+    update_post_meta($post_id, '_ukt_program', $program);
+    update_post_meta($post_id, '_ukt_rating', $rating);
+
+    // Return the data back to JavaScript to create the card dynamically
+    wp_send_json_success(array(
+        'name'    => $name,
+        'healer'  => $healer,
+        'program' => $program,
+        'rating'  => $rating,
+        'review'  => $review,
+        'date'    => date('M d, Y') // Format matching your static HTML
+    ));
+}
+
+
+/* End of review custom post */
+
+// =========================================================
+// 1. REGISTER TESTIMONIAL CUSTOM POST TYPE
+// =========================================================
+add_action('init', 'ukt_register_testimonial_cpt');
+function ukt_register_testimonial_cpt() {
+    register_post_type('ukt_testimonial', [
+        'labels' => [
+            'name'          => 'Testimonials',
+            'singular_name' => 'Testimonial',
+            'add_new'       => 'Add New',
+            'add_new_item'  => 'Add New Testimonial',
+        ],
+        'public'       => false,
+        'show_ui'      => true,
+        'show_in_menu' => true,
+        'supports'     => ['title', 'editor'],
+        'menu_icon'    => 'dashicons-testimonial',
+    ]);
+}
+
+// =========================================================
+// 2. HANDLE AJAX FORM SUBMISSION (PROGRAM TESTIMONIALS)
+// =========================================================
+// Note: Renamed to prevent conflict with the other review function!
+add_action('wp_ajax_submit_program_review', 'ukt_handle_program_testimonial_submission');
+add_action('wp_ajax_nopriv_submit_program_review', 'ukt_handle_program_testimonial_submission');
+
+// =========================================================
+// 2. HANDLE AJAX FORM SUBMISSION (PROGRAM TESTIMONIALS)
+// =========================================================
+add_action('wp_ajax_submit_program_review', 'ukt_handle_program_testimonial_submission');
+add_action('wp_ajax_nopriv_submit_program_review', 'ukt_handle_program_testimonial_submission');
+
+function ukt_handle_program_testimonial_submission() {
+    // Verify Nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'ukt_review_nonce')) {
+        wp_send_json_error(['message' => 'Security check failed. Please refresh and try again.']);
+    }
+
+    // Sanitize inputs based on static HTML form fields
+    $title   = sanitize_text_field($_POST['title'] ?? '');
+    $content = sanitize_textarea_field($_POST['content'] ?? '');
+
+    if (empty($title) || empty($content)) {
+        wp_send_json_error(['message' => 'Please fill in both the Title and Content fields.']);
+    }
+
+    // Insert into Custom Post Type
+    $post_id = wp_insert_post([
+        'post_title'   => $title,
+        'post_content' => $content,
+        'post_status'  => 'publish',
+        'post_type'    => 'ukt_testimonial',
+    ]);
+
+    if (is_wp_error($post_id)) {
+        wp_send_json_error(['message' => 'Failed to save testimonial. Please try again.']);
+    }
+
+    // Format current date
+    $date_str = date('F j, Y');
+
+    // Generate exact HTML matching the static design
+    ob_start();
+    ?>
+    <div class="col-lg-4 col-md-6 col-12 ukt-review-col" id="review-<?php echo esc_attr($post_id); ?>">
+        <div class="ukt-reference-review-card ukt-highlight-new-card">
+            <h4 class="ukt-reference-review-title">
+                "<?php echo esc_html($title); ?>"
+            </h4>
+            <div class="ukt-reference-review-body">
+                <p><?php echo nl2br(esc_html($content)); ?></p>
+            </div>
+            <div class="ukt-reference-review-date">
+                <i class="bi bi-calendar3 me-1"></i> <?php echo esc_html($date_str); ?>
+            </div>
+        </div>
+    </div>
+    <?php
+    $html = ob_get_clean();
+
+    wp_send_json_success(['html' => $html]);
+}
+
+/* End Testimonial */
+
+// 1. Add Meta Box
+function el_add_meta_box() {
+    add_meta_box(
+        'video_section_manager',
+        'Video Section Manager',
+        'el_meta_box_html',
+        'page', 
+        'normal',
+        'high'
+    );
+}
+add_action( 'add_meta_boxes', 'el_add_meta_box' );
+
+// 2. Render Meta Box HTML
+function el_meta_box_html( $post ) {
+    $data = get_post_meta( $post->ID, '_el_video_sections_data', true );
+    if ( ! is_array( $data ) ) {
+        $data = array();
+    } else {
+        // Sort sections by year in descending order (latest year first)
+        usort($data, function($a, $b) {
+            $yearA = isset($a['year']) ? (int)$a['year'] : 0;
+            $yearB = isset($b['year']) ? (int)$b['year'] : 0;
+            return $yearB <=> $yearA; 
+        });
+    }
+
+    wp_nonce_field( 'el_save_video_sections', 'el_video_sections_nonce' );
+    ?>
+
+    <style>
+        .el-manager-wrap { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; }
+        .el-desc { color: #50575e; margin-bottom: 20px; font-size: 13px; }
+        
+        /* Top Add Section Bar */
+        .el-add-section-bar { display: flex; align-items: center; gap: 15px; padding-bottom: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        .el-add-section-bar label { font-weight: 600; font-size: 13px; color: #1d2327; }
+        .el-add-section-bar input[type="text"], .el-add-section-bar input[type="number"] { padding: 4px 8px; border: 1px solid #8c8f94; border-radius: 3px; }
+        .el-add-section-bar input[type="text"] { width: 220px; }
+        .el-add-section-bar input[type="number"] { width: 100px; }
+        .el-btn-primary { background: #2271b1; color: #fff; border: 1px solid #2271b1; padding: 4px 12px; border-radius: 3px; cursor: pointer; font-weight: 500; font-size: 13px; margin-left: auto; }
+        .el-btn-primary:hover { background: #135e96; border-color: #135e96; }
+
+        /* Accordion Groups */
+        .el-section-group { border: 1px solid #c3c4c7; border-radius: 4px; margin-bottom: 15px; background: #fff; overflow: hidden; }
+        .el-section-header { display: flex; justify-content: space-between; align-items: center; background: #f6f7f7; padding: 12px 15px; cursor: pointer; user-select: none; border-bottom: 1px solid #c3c4c7; transition: background 0.2s; }
+        .el-section-header:hover { background: #f0f0f1; }
+        .el-section-group.collapsed .el-section-header { border-bottom-color: transparent; }
+        
+        .el-section-title-wrap { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #1d2327; }
+        
+        /* Arrow Icon */
+        .el-arrow { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #1d2327; transition: transform 0.3s; }
+        .el-section-group.collapsed .el-arrow { transform: rotate(-90deg); }
+
+        /* Delete Buttons */
+        .el-btn-delete-section { background: transparent; color: #d63638; border: 1px solid #d63638; padding: 4px 12px; border-radius: 3px; cursor: pointer; font-size: 13px; font-weight: 500; }
+        .el-btn-delete-section:hover { background: #fcf0f1; border-color: #b32d2e; color: #b32d2e; }
+        .el-btn-remove-video { background: #d63638; color: #fff; border: none; border-radius: 3px; padding: 6px 10px; cursor: pointer; align-self: flex-end; margin-bottom: 1px; }
+
+        /* Body & Fields */
+        .el-section-body { padding: 20px; display: block; }
+        .el-section-group.collapsed .el-section-body { display: none; }
+        .el-field-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end; }
+        .el-field { flex: 1; }
+        .el-field label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; color: #1d2327; }
+        .el-field input[type="text"], .el-field input[type="number"], .el-field textarea { width: 100%; padding: 6px 10px; border: 1px solid #8c8f94; border-radius: 3px; box-sizing: border-box; }
+        .el-field textarea { resize: vertical; min-height: 70px; }
+        
+        /* Video Rows Container */
+        .el-video-rows { background: #f9f9f9; border: 1px solid #e2e4e7; padding: 15px; border-radius: 4px; margin-top: 15px; }
+        .el-video-rows:empty { display: none; /* Hide background if empty */ }
+        .el-add-video-btn { background: #00a32a; color: #fff; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 13px; margin-top: 10px; font-weight: 500; }
+        .el-add-video-btn:hover { background: #008a20; }
+    </style>
+
+    <div class="el-manager-wrap" id="el-manager">
+        <p class="el-desc">Manage Video Sections grouped by year. Click any section header to expand or collapse it. Changes are saved when you click Update on the page.</p>
+
+        <!-- Add New Section Bar -->
+        <div class="el-add-section-bar">
+            <label for="el-new-title">Section Name:</label>
+            <input type="text" id="el-new-title" placeholder="e.g. Inner Growth">
+            
+            <label for="el-new-year">Year:</label>
+            <input type="number" id="el-new-year" placeholder="e.g. 2026" min="1900" max="2100">
+            
+            <button type="button" class="el-btn-primary" id="el-add-section-btn">Add Section</button>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #dcdcde; margin: 0 0 20px 0;">
+
+        <!-- Sections Container -->
+        <div id="el-sections-container">
+            <?php 
+            // Render existing sections
+            if ( ! empty( $data ) ) {
+                foreach ( $data as $sec_index => $section ) {
+                    $sec_title = isset( $section['title'] ) ? esc_attr( $section['title'] ) : '';
+                    $sec_year = isset( $section['year'] ) ? esc_attr( $section['year'] ) : '';
+                    $sec_desc = isset( $section['description'] ) ? esc_textarea( $section['description'] ) : '';
+                    $videos = isset( $section['videos'] ) && is_array( $section['videos'] ) ? $section['videos'] : array();
+                    ?>
+                    <div class="el-section-group collapsed" data-index="<?php echo esc_attr( $sec_index ); ?>" data-year="<?php echo $sec_year; ?>">
+                        <div class="el-section-header">
+                            <div class="el-section-title-wrap">
+                                <span class="el-arrow"></span>
+                                <span class="el-section-display-title"><?php echo esc_html( $sec_title . ($sec_year ? ' (' . $sec_year . ')' : '') ); ?></span>
+                            </div>
+                            <button type="button" class="el-btn-delete-section">Delete Section</button>
+                        </div>
+                        <div class="el-section-body">
+                            
+                            <!-- Section Title & Year Fields -->
+                            <div class="el-field-row">
+                                <div class="el-field">
+                                    <label>Section Title *</label>
+                                    <input type="text" class="el-input-section-title" name="el_data[<?php echo esc_attr( $sec_index ); ?>][title]" value="<?php echo $sec_title; ?>" required>
+                                </div>
+                                <div class="el-field">
+                                    <label>Year *</label>
+                                    <input type="number" class="el-input-section-year" name="el_data[<?php echo esc_attr( $sec_index ); ?>][year]" value="<?php echo $sec_year; ?>" required min="1900" max="2100">
+                                </div>
+                            </div>
+
+                            <!-- Description Field -->
+                            <div class="el-field-row">
+                                <div class="el-field">
+                                    <label>Description</label>
+                                    <textarea name="el_data[<?php echo esc_attr( $sec_index ); ?>][description]"><?php echo $sec_desc; ?></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Video Rows Container -->
+                            <div class="el-video-rows" data-sec-id="<?php echo esc_attr( $sec_index ); ?>">
+                                <?php 
+                                if ( ! empty( $videos ) ) {
+                                    foreach ( $videos as $vid_index => $video ) {
+                                        $v_title = isset( $video['title'] ) ? esc_attr( $video['title'] ) : '';
+                                        $v_url = isset( $video['url'] ) ? esc_attr( $video['url'] ) : '';
+                                        ?>
+                                        <div class="el-field-row el-video-item">
+                                            <div class="el-field">
+                                                <label>Video Title *</label>
+                                                <input type="text" name="el_data[<?php echo esc_attr( $sec_index ); ?>][videos][<?php echo esc_attr( $vid_index ); ?>][title]" value="<?php echo $v_title; ?>" required>
+                                            </div>
+                                            <div class="el-field">
+                                                <label>Video URL *</label>
+                                                <input type="text" name="el_data[<?php echo esc_attr( $sec_index ); ?>][videos][<?php echo esc_attr( $vid_index ); ?>][url]" value="<?php echo $v_url; ?>" required>
+                                            </div>
+                                            <button type="button" class="el-btn-remove-video">Remove</button>
+                                        </div>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </div>
+                            
+                            <button type="button" class="el-add-video-btn">+ Add Video</button>
+                        </div>
+                    </div>
+                    <?php
+                }
+            }
+            ?>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('el-sections-container');
+            const addSecBtn = document.getElementById('el-add-section-btn');
+            const titleInput = document.getElementById('el-new-title');
+            const yearInput = document.getElementById('el-new-year');
+            
+            let sectionIndex = <?php echo count($data); ?>;
+
+            // Toggle Accordion
+            container.addEventListener('click', function(e) {
+                const header = e.target.closest('.el-section-header');
+                if (header && !e.target.classList.contains('el-btn-delete-section')) {
+                    header.closest('.el-section-group').classList.toggle('collapsed');
+                }
+            });
+
+            // Live update header title while typing inside the body
+            container.addEventListener('input', function(e) {
+                if (e.target.classList.contains('el-input-section-title') || e.target.classList.contains('el-input-section-year')) {
+                    const group = e.target.closest('.el-section-group');
+                    const t = group.querySelector('.el-input-section-title').value || 'Untitled Section';
+                    const y = group.querySelector('.el-input-section-year').value;
+                    group.querySelector('.el-section-display-title').textContent = t + (y ? ' (' + y + ')' : '');
+                }
+            });
+
+            // Add Section Logic
+            addSecBtn.addEventListener('click', function() {
+                const title = titleInput.value.trim();
+                const year = yearInput.value.trim();
+                
+                if (!title) {
+                    alert('Please enter a Section Name.');
+                    titleInput.focus();
+                    return;
+                }
+                if (!year || year < 1900 || year > 2100) {
+                    alert('Please enter a valid 4-digit Year.');
+                    yearInput.focus();
+                    return;
+                }
+
+                const html = `
+                <div class="el-section-group collapsed" data-index="${sectionIndex}" data-year="${year}">
+                    <div class="el-section-header">
+                        <div class="el-section-title-wrap">
+                            <span class="el-arrow"></span>
+                            <span class="el-section-display-title">${title} (${year})</span>
+                        </div>
+                        <button type="button" class="el-btn-delete-section">Delete Section</button>
+                    </div>
+                    <div class="el-section-body">
+                        <div class="el-field-row">
+                            <div class="el-field">
+                                <label>Section Title *</label>
+                                <input type="text" class="el-input-section-title" name="el_data[${sectionIndex}][title]" value="${title}" required>
+                            </div>
+                            <div class="el-field">
+                                <label>Year *</label>
+                                <input type="number" class="el-input-section-year" name="el_data[${sectionIndex}][year]" value="${year}" required min="1900" max="2100">
+                            </div>
+                        </div>
+                        
+                        <!-- New Description Field -->
+                        <div class="el-field-row">
+                            <div class="el-field">
+                                <label>Description</label>
+                                <textarea name="el_data[${sectionIndex}][description]"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="el-video-rows" data-sec-id="${sectionIndex}"></div>
+                        <button type="button" class="el-add-video-btn">+ Add Video</button>
+                    </div>
+                </div>`;
+
+                // Add to the top
+                container.insertAdjacentHTML('afterbegin', html);
+                
+                titleInput.value = ''; 
+                yearInput.value = '';
+                sectionIndex++;
+            });
+
+            // Delete Section
+            container.addEventListener('click', function(e) {
+                if (e.target.classList.contains('el-btn-delete-section')) {
+                    if (confirm('Are you sure you want to delete this entire section?')) {
+                        e.target.closest('.el-section-group').remove();
+                    }
+                }
+            });
+
+            // Add Video Row
+            container.addEventListener('click', function(e) {
+                if (e.target.classList.contains('el-add-video-btn')) {
+                    const body = e.target.closest('.el-section-body');
+                    const videoContainer = body.querySelector('.el-video-rows');
+                    const secId = videoContainer.getAttribute('data-sec-id');
+                    const vidCount = videoContainer.querySelectorAll('.el-video-item').length;
+
+                    const html = `
+                    <div class="el-field-row el-video-item">
+                        <div class="el-field">
+                            <label>Video Title *</label>
+                            <input type="text" name="el_data[${secId}][videos][${vidCount}][title]" value="" required>
+                        </div>
+                        <div class="el-field">
+                            <label>Video URL *</label>
+                            <input type="text" name="el_data[${secId}][videos][${vidCount}][url]" value="" required>
+                        </div>
+                        <button type="button" class="el-btn-remove-video">Remove</button>
+                    </div>`;
+                    
+                    videoContainer.insertAdjacentHTML('beforeend', html);
+                }
+            });
+
+            // Remove Video Row
+            container.addEventListener('click', function(e) {
+                if (e.target.classList.contains('el-btn-remove-video')) {
+                    e.target.closest('.el-video-item').remove();
+                }
+            });
+        });
+    </script>
+    <?php
+}
+
+// 3. Save Meta Box Data
+function el_save_video_sections_meta( $post_id ) {
+    if ( ! isset( $_POST['el_video_sections_nonce'] ) || ! wp_verify_nonce( $_POST['el_video_sections_nonce'], 'el_save_video_sections' ) ) {
+        return;
+    }
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+    if ( ! current_user_can( 'edit_page', $post_id ) ) {
+        return;
+    }
+
+    $saved_data = array();
+
+    if ( isset( $_POST['el_data'] ) && is_array( $_POST['el_data'] ) ) {
+        foreach ( $_POST['el_data'] as $section ) {
+            
+            $clean_title = isset( $section['title'] ) ? sanitize_text_field( $section['title'] ) : '';
+            $clean_year = isset( $section['year'] ) ? sanitize_text_field( $section['year'] ) : '';
+            $clean_desc = isset( $section['description'] ) ? sanitize_textarea_field( $section['description'] ) : '';
+            
+            if ( empty( $clean_title ) || empty( $clean_year ) ) {
+                continue;
+            }
+
+            $clean_videos = array();
+            if ( isset( $section['videos'] ) && is_array( $section['videos'] ) ) {
+                foreach ( $section['videos'] as $video ) {
+                    $v_title = isset( $video['title'] ) ? sanitize_text_field( $video['title'] ) : '';
+                    $v_url = isset( $video['url'] ) ? sanitize_text_field( $video['url'] ) : '';
+                    
+                    if ( ! empty( $v_title ) && ! empty( $v_url ) ) {
+                        $clean_videos[] = array(
+                            'title' => $v_title,
+                            'url'   => $v_url
+                        );
+                    }
+                }
+            }
+
+            $saved_data[] = array(
+                'title'       => $clean_title,
+                'year'        => $clean_year,
+                'description' => $clean_desc,
+                'videos'      => $clean_videos
+            );
+        }
+    }
+
+    update_post_meta( $post_id, '_el_video_sections_data', $saved_data );
+}
+add_action( 'save_post_page', 'el_save_video_sections_meta' );
+
+// 4. Frontend Data Helper
+function el_get_video_sections_data( $post_id = null ) {
+    $post_id = $post_id ?: get_the_ID();
+    if ( ! $post_id ) return array();
+    
+    $data = get_post_meta( $post_id, '_el_video_sections_data', true );
+    
+    if ( ! is_array( $data ) ) {
+        return array();
+    }
+
+    // Sort sections by year in descending order on the frontend as well
+    usort($data, function($a, $b) {
+        $yearA = isset($a['year']) ? (int)$a['year'] : 0;
+        $yearB = isset($b['year']) ? (int)$b['year'] : 0;
+        return $yearB <=> $yearA;
+    });
+
+    return $data;
+}
+
+
+// Extract youtube link
+function ukt_get_youtube_thumbnail($url, $quality = 'maxresdefault') {
+    $video_id = '';
+    
+    // Extract the 11-character video ID using Regex
+    if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})%i', $url, $match)) {
+        $video_id = $match[1];
+    }
+    
+    // If a valid ID was found, return the thumbnail URL
+    if ($video_id) {
+        return $video_id;
+        // return "https://img.youtube.com/vi/" . $video_id . "/" . $quality . ".jpg";
+    }
+    
+    return false; // Return false if no valid ID found
+}
