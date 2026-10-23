@@ -7197,6 +7197,10 @@ button {
     align-items: stretch;
 }
 
+.owl-stage > div {
+    min-width: 400px;
+}
+
 .ukt-program-carousel .owl-item {
     display: flex;
     height: auto;

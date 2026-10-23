@@ -1,0 +1,43 @@
+dynamic page universal knowledge trust
+
+1. about us. - pending.
+2. e-letters. -> Done. ( you can update the data in e-letters page)
+3. inspitantional videos. -> Done ( if you add post with category inspirational videos it will automatically added as card and as a single page/article).
+4. books and articles -> books, articles, gifts => Done ( for books, agnihotra materials and gift you just go to "books-and-articles" and you will the custom boxes for the books, agnihotra ... etc, for articles go to post add post under press release and any category under it to appear here and also in the press release).
+5. Activities
+    |- Our Events
+    	|- All Our Events
+    |- spirituality and events
+    	|- Spirituality
+    |- Training programs
+    	|- our training programs.
+    	|- all school training programs.
+    	|- downloads for school training programs.
+    |- we support
+    	|- we support
+    |- Project green
+    	|- all green projects
+    	|- nature retreats
+    	|- conclaves
+    	|- camps
+6. Healing Solutions
+    |- Healing
+    	|- All healing solutions
+    	|- self healing & inner growth
+    	|- golden healing hands
+    	|- mantra downloads
+7. Reviews & Testimonials
+    |- Press 
+    	|-  Press Release => Done ( if you want to add the articles here go to post fill the details (title, description, thumbnail etc than check the category as press release or any under the press release). 
+    |- Reviews on website.
+    	|- Reviews on website.
+    	|- Reviews on google map (not sure).
+    |- Testimonials
+    	|- Program testimonials.
+    	|- Video testimonials.
+8. Contact us
+    |- contact us
+
+
+
+
