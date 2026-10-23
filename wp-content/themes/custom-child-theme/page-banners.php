@@ -389,15 +389,15 @@ switch ($page_slug) {
                                                 Watch inspiring video testimonials, participant reflections, and heartfelt retreat feedback shared by seekers whose lives have been deeply transformed through Universal Knowledge Trust.
                                             </p>
 
-                                            <!-- <div class="ukt-hero-action-row">
-                                                <a href="#inner-growth-2023" class="ukt-hero-primary-action">
+                                            <div class="ukt-hero-action-row">
+                                                <a href="#video-section" class="ukt-hero-primary-action">
                                                     Watch Testimonials
                                                     <i class="bi bi-play-circle ms-1"></i>
                                                 </a>
-                                                <a href="#uk-retreat-2022" class="ukt-hero-secondary-action">
+                                                <!-- <a href="#uk-retreat-2022" class="ukt-hero-secondary-action">
                                                     <i class="bi bi-collection-play me-1"></i> Explore Series
-                                                </a>
-                                            </div> -->
+                                                </a> -->
+                                            </div>
 
                                         </div>
                                     </div>
@@ -419,6 +419,261 @@ switch ($page_slug) {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <?php
+        break;
+    
+    case 'universal-talk':
+        ?>
+            <!-- =========================================================
+         UNIVERSAL TALK HERO BANNER SECTION
+         (Matches inner page showcase hero layout)
+    ========================================================== -->
+        <section class="ukt-hero-showcase">
+            <div class="ukt-hero-slide-layout">
+                <div class="container-fluid">
+                    <div class="row g-0 align-items-stretch">
+
+                        <!-- LEFT CONTENT AREA -->
+                        <div class="col-lg-5 d-flex align-items-center">
+                            <div class="ukt-hero-copy-zone">
+                                <div class="ukt-hero-left-decoration"></div>
+
+                                <div class="ukt-hero-slide-kicker">
+                                    Universal Talk
+                                </div>
+
+                                <h1 class="ukt-hero-main-title">
+                                    Inspiring Discourses, Wisdom &amp; Knowledge
+                                </h1>
+
+                                <div class="ukt-hero-script-line">
+                                    Educate, Inspire, Transform
+                                </div>
+
+                                <p class="ukt-hero-description">
+                                    Universal Talk is an endeavour by Universal Knowledge Trust to educate and enthrall
+                                    audiences on various topics. Explore video discourses and workshops on spirituality,
+                                    healing, nature, and positive living.
+                                </p>
+
+                                <div class="ukt-hero-action-row">
+                                    <a href="#universal-talks-gallery" class="ukt-hero-primary-action">
+                                        Explore Videos
+                                        <i class="bi bi-arrow-down"></i>
+                                    </a>
+
+                                    <a href="https://www.youtube.com/channel/UCM4kouXxWDEJQU-rJic5fNg/" target="_blank"
+                                        rel="noopener noreferrer" class="ukt-hero-secondary-action">
+                                        <i class="bi bi-youtube text-danger me-1"></i> YouTube Channel
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- RIGHT IMAGE AREA -->
+                        <div class="col-lg-7">
+                            <div class="ukt-hero-visual-zone">
+                                <div class="ukt-hero-image-frame">
+                                    <img src="<?php echo get_stylesheet_directory_uri();?>/assets/images/universal-knowledge-universal-talks.jpg"
+                                        alt="Universal Talk - Video Discourses by Universal Knowledge Trust"
+                                        title="Universal Talk - Universal Knowledge Trust" loading="eager">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <?php
+        break;
+
+    case 'all-our-events':
+        ?>
+        <!-- =========================================================
+             NATURE RETREATS BANNER / HERO SECTION
+             (Matches index.html showcase hero layout)
+        ========================================================== -->
+    <section class="ukt-hero-showcase">
+        <div class="ukt-hero-slide-layout">
+            <div class="container-fluid">
+                <div class="row g-0 align-items-stretch">
+
+                    <!-- LEFT CONTENT AREA -->
+                    <div class="col-lg-5 d-flex align-items-center">
+                        <div class="ukt-hero-copy-zone">
+                            <div class="ukt-hero-left-decoration"></div>
+
+                            <div class="ukt-hero-slide-kicker">Universal Knowledge Trust • Events
+                            </div>
+
+                            <h1 class="ukt-hero-main-title">
+                                <span>Transformative</span>
+                                <span>Events</span>
+                            </h1>
+
+                            <div class="ukt-hero-script-line">
+                                Reclaim Stillness. Reconnect Within.
+                            </div>
+
+                            <p class="ukt-hero-description">
+                                Explore transformative events: energy healing, Agnihotra purification, and guided meditations in nature.
+                            </p>
+
+                            <div class="ukt-hero-action-row">
+                                <a href="#articles" class="ukt-hero-primary-action">
+                                    Explore Events
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- RIGHT IMAGE AREA -->
+                    <div class="col-lg-7">
+                        <div class="ukt-hero-visual-zone">
+                            <div class="ukt-hero-image-frame">
+                                <figure class="ukt-figure-fill">
+                                    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/universal-knowledge-trust-our-events-banner.jpg"
+                                        alt="Nature Retreats - Universal Knowledge Trust - Reclaim Stillness, Reconnect Within"
+                                        loading="eager">
+                                    <figcaption class="visually-hidden">Nature Retreats - Universal Knowledge Trust - Reclaim Stillness, Reconnect Within</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php
+        break;
+    case 'spirituality':
+        ?>
+        <!-- =========================================================
+         ABOUT US BANNER / HERO SECTION
+         (Matches index.html showcase hero layout)
+    ========================================================== -->
+    <section class="ukt-hero-showcase">
+        <div class="ukt-hero-slide-layout">
+            <div class="container-fluid">
+                <div class="row g-0 align-items-stretch">
+
+                    <!-- LEFT CONTENT AREA -->
+                    <div class="col-lg-5 d-flex align-items-center">
+                        <div class="ukt-hero-copy-zone">
+                            <div class="ukt-hero-left-decoration"></div>
+
+                            <div class="ukt-hero-slide-kicker">
+                                spirituality
+                            </div>
+
+                            <h1 class="ukt-hero-main-title">
+                                <span>Where Awareness Becomes</span>
+                                <span>a Way of Life</span>
+                            </h1>
+
+                            <div class="ukt-hero-script-line">
+                                Awaken · Harmonize · Uplift
+                            </div>
+
+                            <p class="ukt-hero-description">
+                                Explore the path of inner awareness, self-discovery and spiritual growth. Find inspiration, wisdom and practices that help you connect with yourself and experience life with greater peace, purpose and understanding.
+                            </p>
+
+                            <div class="ukt-hero-action-row">
+                                <a href="#articles" class="ukt-hero-primary-action">
+                                    Explore Spirituality
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- RIGHT IMAGE AREA -->
+                    <div class="col-lg-7">
+                        <div class="ukt-hero-visual-zone">
+                            <div class="ukt-hero-image-frame">
+                                <figure class="ukt-figure-fill">
+                                    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/spirituality-banner.jpg"
+                                        alt="Spirituality - Universal Knowledge Trust - Inner Harmony and Service">
+                                    <figcaption class="visually-hidden">Spirituality - Universal Knowledge Trust - Inner Harmony and Service</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php
+        break;
+    
+    case 'our-training-programs':
+        ?>
+                        <!-- =========================================================
+             NATURE RETREATS BANNER / HERO SECTION
+             (Matches index.html showcase hero layout)
+        ========================================================== -->
+        <section class="ukt-hero-showcase">
+            <div class="ukt-hero-slide-layout">
+                <div class="container-fluid">
+                    <div class="row g-0 align-items-stretch">
+
+                        <!-- LEFT CONTENT AREA -->
+                        <div class="col-lg-5 d-flex align-items-center">
+                            <div class="ukt-hero-copy-zone">
+                                <div class="ukt-hero-left-decoration"></div>
+
+                                <div class="ukt-hero-slide-kicker">Universal Knowledge Trust • Training Programs
+                                </div>
+
+                                <h1 class="ukt-hero-main-title">
+                                    <span>Transformative</span>
+                                    <span>Training Programs</span>
+                                </h1>
+
+                                <div class="ukt-hero-script-line">
+                                    Build Focus. Elevate Performance.
+                                </div>
+
+                                <p class="ukt-hero-description">
+                                    Elevate mind and body with focused training programs designed for clarity, discipline, and peak performance.
+                                </p>
+
+                                <div class="ukt-hero-action-row">
+                                    <a href="#training-in-schools" class="ukt-hero-primary-action">
+                                        Explore Training Programs
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- RIGHT IMAGE AREA -->
+                        <div class="col-lg-7">
+                            <div class="ukt-hero-visual-zone">
+                                <div class="ukt-hero-image-frame">
+                                    <figure class="ukt-figure-fill">
+                                        <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/universal-knowledge-trust-training-programs-banner.jpg"
+                                            alt="Training Programs - Universal Knowledge Trust - Build Focus, Elevate Performance"
+                                            loading="eager">
+                                        <figcaption class="visually-hidden">Training Programs - Universal Knowledge Trust - Build Focus, Elevate Performance</figcaption>
+                                    </figure>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

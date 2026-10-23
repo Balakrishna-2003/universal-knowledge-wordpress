@@ -1492,6 +1492,9 @@ function ukt_handle_program_testimonial_submission() {
 
 /* End Testimonial */
 
+
+/* Begin Video Testimonials */
+/*
 // 1. Add Meta Box
 function el_add_meta_box() {
     add_meta_box(
@@ -1502,11 +1505,25 @@ function el_add_meta_box() {
         'normal',
         'high'
     );
-}
-add_action( 'add_meta_boxes', 'el_add_meta_box' );
+}*/
+
+add_action( 'add_meta_boxes', function($post_type, $post){
+    if ($post_type !== 'page' || !$post) return;
+    if ($post->post_name !== 'video-testimonials') return;
+    add_meta_box(
+        'video_section_manager',
+        'Video Section Manager',
+        'el_meta_box_html',
+        'page', 
+        'normal',
+        'high'
+    );
+
+},10, 2);
 
 // 2. Render Meta Box HTML
 function el_meta_box_html( $post ) {
+    
     $data = get_post_meta( $post->ID, '_el_video_sections_data', true );
     if ( ! is_array( $data ) ) {
         $data = array();
@@ -1864,7 +1881,6 @@ function el_get_video_sections_data( $post_id = null ) {
     return $data;
 }
 
-
 // Extract youtube link
 function ukt_get_youtube_thumbnail($url, $quality = 'maxresdefault') {
     $video_id = '';
@@ -1881,4 +1897,227 @@ function ukt_get_youtube_thumbnail($url, $quality = 'maxresdefault') {
     }
     
     return false; // Return false if no valid ID found
+}
+
+
+/* End Video Testimonials */
+
+
+/* Begin Universal Talk */
+
+// 1. Add Meta Box
+function ut_add_featured_videos_meta_box() {
+    global $post;
+
+    // Only add if the page slug is 'universal-talk'
+    if ( $post && get_post_field( 'post_name', $post->ID ) === 'universal-talk' ) {
+        add_meta_box(
+            'ut_featured_videos',
+            'Featured Videos',
+            'ut_featured_videos_meta_box_html',
+            'page',
+            'normal',
+            'high'
+        );
+    }
+}
+add_action( 'add_meta_boxes', 'ut_add_featured_videos_meta_box' );
+
+// 2. Render Meta Box HTML & JS
+function ut_featured_videos_meta_box_html( $post ) {
+    $data = get_post_meta( $post->ID, '_ut_featured_videos_data', true );
+    if ( ! is_array( $data ) ) {
+        $data = array();
+    }
+
+    wp_nonce_field( 'ut_save_featured_videos', 'ut_featured_videos_nonce' );
+    ?>
+
+    <style>
+        .ut-video-row { display: flex; flex-wrap: wrap; gap: 15px; background: #f9f9f9; padding: 15px; border: 1px solid #e2e4e7; margin-bottom: 15px; border-radius: 4px; position: relative; }
+        .ut-field { display: flex; flex-direction: column; }
+        .ut-field label { font-weight: 600; font-size: 13px; margin-bottom: 5px; color: #1d2327; }
+        .ut-field input[type="text"], .ut-field textarea { width: 100%; padding: 8px; border: 1px solid #8c8f94; border-radius: 3px; box-sizing: border-box; }
+        .ut-field textarea { resize: vertical; min-height: 60px; }
+        
+        .ut-col-half { flex: 1; min-width: 200px; }
+        .ut-col-full { width: 100%; }
+        
+        .ut-btn { cursor: pointer; padding: 8px 16px; border: none; border-radius: 3px; font-weight: 600; font-size: 13px; text-decoration: none; display: inline-block; }
+        .ut-btn-add { background: #2271b1; color: #fff; width: 100%; text-align: center; margin-top: 10px; font-size: 14px; padding: 12px; }
+        .ut-btn-add:hover { background: #135e96; }
+        .ut-btn-remove { background: #d63638; color: #fff; align-self: flex-end; margin-bottom: 1px; padding: 6px 12px; }
+        .ut-btn-remove:hover { background: #b32d2e; }
+    </style>
+
+    <div id="ut-videos-container">
+        <?php 
+        $index = 0;
+        if ( ! empty( $data ) ) {
+            foreach ( $data as $video ) {
+                ut_render_admin_video_row( $index, $video );
+                $index++;
+            }
+        }
+        ?>
+    </div>
+
+    <button type="button" class="ut-btn ut-btn-add" id="ut-add-video-btn">+ Add Featured Video</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let videoIndex = <?php echo $index; ?>;
+            const container = document.getElementById('ut-videos-container');
+            const addBtn = document.getElementById('ut-add-video-btn');
+
+            addBtn.addEventListener('click', function() {
+                const html = `
+                <div class="ut-video-row">
+                    <button type="button" class="ut-btn ut-btn-remove ut-remove-btn">Remove</button>
+                    
+                    <div class="ut-field ut-col-half">
+                        <label>Video Title *</label>
+                        <input type="text" name="ut_videos[${videoIndex}][title]" required>
+                    </div>
+                    <div class="ut-field ut-col-half">
+                        <label>Video Link *</label>
+                        <input type="text" name="ut_videos[${videoIndex}][link]" required>
+                    </div>
+                    
+                    <div class="ut-field ut-col-half">
+                        <label>Author Name</label>
+                        <input type="text" name="ut_videos[${videoIndex}][author]">
+                    </div>
+                    <div class="ut-field ut-col-half">
+                        <label>Tag Name (e.g. introduction)</label>
+                        <input type="text" name="ut_videos[${videoIndex}][tag]">
+                    </div>
+                    
+                    <div class="ut-field ut-col-full">
+                        <label>Description</label>
+                        <textarea name="ut_videos[${videoIndex}][description]" rows="3"></textarea>
+                    </div>
+                </div>`;
+                
+                container.insertAdjacentHTML('beforeend', html);
+                videoIndex++;
+            });
+
+            // Remove Video Row
+            container.addEventListener('click', function(e) {
+                if (e.target.classList.contains('ut-remove-btn')) {
+                    if (confirm('Are you sure you want to remove this video?')) {
+                        e.target.closest('.ut-video-row').remove();
+                    }
+                }
+            });
+        });
+    </script>
+    <?php
+}
+
+// Helper function to render existing row in PHP
+function ut_render_admin_video_row( $index, $video ) {
+    $title = isset( $video['title'] ) ? esc_attr( $video['title'] ) : '';
+    $link = isset( $video['link'] ) ? esc_attr( $video['link'] ) : '';
+    $author = isset( $video['author'] ) ? esc_attr( $video['author'] ) : '';
+    $tag = isset( $video['tag'] ) ? esc_attr( $video['tag'] ) : '';
+    $desc = isset( $video['description'] ) ? esc_textarea( $video['description'] ) : '';
+    ?>
+    <div class="ut-video-row">
+        <button type="button" class="ut-btn ut-btn-remove ut-remove-btn">Remove</button>
+        
+        <div class="ut-field ut-col-half">
+            <label>Video Title *</label>
+            <input type="text" name="ut_videos[<?php echo $index; ?>][title]" value="<?php echo $title; ?>" required>
+        </div>
+        <div class="ut-field ut-col-half">
+            <label>Video Link *</label>
+            <input type="text" name="ut_videos[<?php echo $index; ?>][link]" value="<?php echo $link; ?>" required>
+        </div>
+        
+        <div class="ut-field ut-col-half">
+            <label>Author Name</label>
+            <input type="text" name="ut_videos[<?php echo $index; ?>][author]" value="<?php echo $author; ?>">
+        </div>
+        <div class="ut-field ut-col-half">
+            <label>Tag Name (e.g. introduction)</label>
+            <input type="text" name="ut_videos[<?php echo $index; ?>][tag]" value="<?php echo $tag; ?>">
+        </div>
+        
+        <div class="ut-field ut-col-full">
+            <label>Description</label>
+            <textarea name="ut_videos[<?php echo $index; ?>][description]" rows="3"><?php echo $desc; ?></textarea>
+        </div>
+    </div>
+    <?php
+}
+
+// 3. Save Meta Box Data
+function ut_save_featured_videos_meta( $post_id ) {
+    if ( ! isset( $_POST['ut_featured_videos_nonce'] ) || ! wp_verify_nonce( $_POST['ut_featured_videos_nonce'], 'ut_save_featured_videos' ) ) {
+        return;
+    }
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+    if ( ! current_user_can( 'edit_page', $post_id ) ) {
+        return;
+    }
+
+    $saved_data = array();
+
+    if ( isset( $_POST['ut_videos'] ) && is_array( $_POST['ut_videos'] ) ) {
+        foreach ( $_POST['ut_videos'] as $video ) {
+            
+            $clean_title = isset( $video['title'] ) ? sanitize_text_field( $video['title'] ) : '';
+            $clean_link = isset( $video['link'] ) ? sanitize_text_field( $video['link'] ) : '';
+            
+            // Skip if title and link are empty
+            if ( empty( $clean_title ) || empty( $clean_link ) ) {
+                continue;
+            }
+
+            $saved_data[] = array(
+                'title'       => $clean_title,
+                'link'        => $clean_link,
+                'author'      => isset( $video['author'] ) ? sanitize_text_field( $video['author'] ) : '',
+                'tag'         => isset( $video['tag'] ) ? sanitize_text_field( $video['tag'] ) : '',
+                'description' => isset( $video['description'] ) ? sanitize_textarea_field( $video['description'] ) : '',
+            );
+        }
+    }
+
+    update_post_meta( $post_id, '_ut_featured_videos_data', $saved_data );
+}
+add_action( 'save_post_page', 'ut_save_featured_videos_meta' );
+
+// Trim by letters function for tag
+function trim_by_letters($text, $limit = 30) {
+    // Strip HTML tags first (optional, but good for descriptions)
+    $text = strip_tags($text); 
+    
+    // Check if the text is longer than the limit
+    if (mb_strlen($text, 'UTF-8') > $limit) {
+        // Trim to limit and add ...
+        return mb_substr($text, 0, $limit, 'UTF-8') . '...';
+    }
+    
+    return $text;
+}
+
+// 4. Frontend Data Helper Function
+function ut_get_featured_videos( $post_id = null ) {
+    $post_id = $post_id ?: get_the_ID();
+    if ( ! $post_id ) {
+        return array();
+    }
+
+    $data = get_post_meta( $post_id, '_ut_featured_videos_data', true );
+    
+    if ( ! is_array( $data ) ) {
+        return array();
+    }
+
+    return $data;
 }

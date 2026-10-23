@@ -11976,6 +11976,7 @@ button {
     gap: 8px;
     z-index: 2;
     pointer-events: none;
+    text-transform: capitalize;
 }
 
 .ukt-yt-channel-avatar {
@@ -12179,7 +12180,8 @@ button {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 60%;
-    justify-content: flex-end;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .ukt-yt-speaker i {
@@ -12199,6 +12201,7 @@ button {
     -webkit-box-orient: vertical;
     overflow: hidden;
     min-height: 42px;
+    text-transform: capitalize;
 }
 
 .ukt-yt-screen-desc {
@@ -23689,6 +23692,7 @@ body.ukt-print-body {
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     transition: all 0.2s ease;
 }
@@ -24999,4 +25003,8 @@ body.ukt-print-body {
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--ukt-gold-dark);
+}
+
+.owl-item>.item {
+    width: 100%;
 }
