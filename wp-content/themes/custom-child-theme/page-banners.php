@@ -680,6 +680,72 @@ switch ($page_slug) {
         </section>
         <?php
         break;
+
+    case 'all-school-training-programs':
+        ?>
+        <!-- =========================================================
+             SCHOOL TRAINING PROGRAMS BANNER / HERO SECTION
+             (Matches index.html showcase hero layout)
+        ========================================================== -->
+    <section class="ukt-hero-showcase">
+        <div class="ukt-hero-slide-layout">
+            <div class="container-fluid">
+                <div class="row g-0 align-items-stretch">
+
+                    <!-- LEFT CONTENT AREA -->
+                    <div class="col-lg-5 d-flex align-items-center">
+                        <div class="ukt-hero-copy-zone">
+                            <div class="ukt-hero-left-decoration"></div>
+
+                            <div class="ukt-hero-slide-kicker">
+                                school training programs
+                            </div>
+
+                            <h1 class="ukt-hero-main-title">
+                                <span>Empowering Young Minds</span>
+                                <span>for a Brighter Future</span>
+                            </h1>
+
+                            <div class="ukt-hero-script-line">
+                                Focus · Values · Character Building
+                            </div>
+
+                            <p class="ukt-hero-description">
+                                Transforming education through value-based training, memory enhancement, emotional
+                                balance, and youth empowerment. Universal Knowledge Trust has trained over 65,000+
+                                government school children across India.
+                            </p>
+
+                            <div class="ukt-hero-action-row">
+                                <a href="#articles" class="ukt-hero-primary-action">
+                                    Explore Training Programs
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- RIGHT IMAGE AREA -->
+                    <div class="col-lg-7">
+                        <div class="ukt-hero-visual-zone">
+                            <div class="ukt-hero-image-frame">
+                                <figure class="ukt-hero-image-figure">
+                                    <img src="<?php echo get_stylesheet_directory_uri();?>/assets/images/universal-knowledge-training-programs.jpg"
+                                        alt="School Training Programs - Universal Knowledge Trust - Empowering Young Minds">
+                                    <figcaption class="visually-hidden">School Training Programs - Universal
+                                        Knowledge Trust - Empowering Young Minds</figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+        <?php
+        break;
     
     default:
         # code...

@@ -79,7 +79,12 @@ $posts = new WP_Query($args);
                                                 <a class="ukt-press-badge" href="<?php echo esc_url(get_category_link($category->term_id)) ?>"><?php echo $category->name; ?></a>
                                         <?php
                                                 $serial++;
-                                            } else {
+                                            } else if($serial == 1){
+                                                ?>
+                                                <a class="ukt-press-badge" href="<?php echo esc_url(get_category_link($category->term_id)) ?>"><?php echo $category->name; ?></a>
+                                                <?php
+                                                break;
+                                            }else {
                                                 echo '<span>...<span>';
                                                 break;
                                             }

@@ -2121,3 +2121,449 @@ function ut_get_featured_videos( $post_id = null ) {
 
     return $data;
 }
+
+/* End of Universal Talk */
+
+/* Begin Downloads for school training programs */
+// 1. Add Meta Box
+function ds_add_materials_meta_box() {
+    global $post;
+
+    // Only add if the page slug is 'downloads-for-school-training-programs'
+    if ( $post && get_post_field( 'post_name', $post->ID ) === 'downloads-for-school-training-programs' ) {
+        add_meta_box(
+            'ds_downloadable_materials',
+            'Add Downloadable materials',
+            'ds_materials_meta_box_html',
+            'page',
+            'normal',
+            'high'
+        );
+    }
+}
+add_action( 'add_meta_boxes', 'ds_add_materials_meta_box' );
+
+// 2. Render Meta Box HTML & JS
+function ds_materials_meta_box_html( $post ) {
+    wp_enqueue_media();
+
+    // Get existing data
+    $files_data = get_post_meta( $post->ID, '_ds_downloadable_materials', true );
+    if ( ! is_array( $files_data ) ) $files_data = array();
+
+    $audio_data = get_post_meta( $post->ID, '_ds_downloadable_audios', true );
+    if ( ! is_array( $audio_data ) ) $audio_data = array();
+
+    $video_data = get_post_meta( $post->ID, '_ds_daily_practice_videos', true );
+    if ( ! is_array( $video_data ) ) $video_data = array();
+
+    wp_nonce_field( 'ds_save_materials', 'ds_materials_nonce' );
+    ?>
+
+    <style>
+        .ds-accordion { border: 1px solid #c3c4c7; border-radius: 4px; margin-bottom: 15px; background: #fff; }
+        .ds-accordion-header { display: flex; justify-content: space-between; align-items: center; background: #f6f7f7; padding: 12px 15px; cursor: pointer; user-select: none; border-radius: 4px; font-weight: 600; font-size: 14px; color: #1d2327; transition: background 0.2s; }
+        .ds-accordion-header:hover { background: #f0f0f1; }
+        .ds-accordion.open .ds-accordion-header { border-bottom: 1px solid #c3c4c7; border-radius: 4px 4px 0 0; }
+        
+        .ds-arrow { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #1d2327; transition: transform 0.3s; }
+        .ds-accordion.open .ds-arrow { transform: rotate(180deg); }
+
+        .ds-accordion-body { display: none; padding: 20px; }
+        .ds-accordion.open .ds-accordion-body { display: block; }
+
+        .ds-row { display: flex; flex-wrap: wrap; gap: 15px; background: #f9f9f9; padding: 15px; border: 1px solid #e2e4e7; margin-bottom: 15px; border-radius: 4px; position: relative; align-items: flex-end; }
+        
+        .ds-field { display: flex; flex-direction: column; min-width: 150px; }
+        .ds-field label { font-weight: 600; font-size: 13px; margin-bottom: 5px; color: #1d2327; }
+        .ds-field input[type="text"] { width: 100%; padding: 6px 10px; border: 1px solid #8c8f94; border-radius: 3px; box-sizing: border-box; height: 35px; }
+        
+        /* Field Widths */
+        .ds-field-title { flex: 2; }
+        .ds-field-file { flex: 2; }
+        .ds-field-tagline { flex: 1; }
+        
+        .ds-field-audio-title { flex: 1; }
+        .ds-field-audio-file { flex: 1; }
+        
+        .ds-field-video-title { flex: 1; }
+        .ds-field-video-url { flex: 1; }
+        
+        /* File Upload specific styles */
+        .ds-upload-wrap { display: flex; gap: 8px; }
+        .ds-upload-wrap input[type="text"] { flex: 1; background: #f0f0f1; cursor: not-allowed; }
+        .ds-upload-btn { background: #2271b1; color: #fff; border: none; padding: 0 12px; border-radius: 3px; cursor: pointer; font-weight: 500; font-size: 13px; height: 35px; }
+        .ds-upload-btn:hover { background: #135e96; }
+
+        .ds-btn { cursor: pointer; padding: 8px 16px; border: none; border-radius: 3px; font-weight: 600; font-size: 13px; text-decoration: none; display: inline-block; }
+        .ds-btn-add { background: #2271b1; color: #fff; width: 100%; text-align: center; font-size: 14px; padding: 12px; }
+        .ds-btn-add:hover { background: #135e96; }
+        .ds-btn-remove { background: #d63638; color: #fff; height: 35px; padding: 0 12px; margin-bottom: 0px; }
+        .ds-btn-remove:hover { background: #b32d2e; }
+    </style>
+
+    <!-- ACCORDION 1: FILES -->
+    <div class="ds-accordion open" id="ds-accordion-files">
+        <div class="ds-accordion-header ds-toggle-header">
+            <span>Add Files (e.g pdf, excel etc)</span>
+            <span class="ds-arrow"></span>
+        </div>
+        <div class="ds-accordion-body">
+            <div id="ds-files-container">
+                <?php 
+                $file_index = 0;
+                if ( ! empty( $files_data ) ) {
+                    foreach ( $files_data as $file ) {
+                        ds_render_admin_file_row( $file_index, $file );
+                        $file_index++;
+                    }
+                }
+                ?>
+            </div>
+            <button type="button" class="ds-btn ds-btn-add" id="ds-add-file-btn">+ Add New File</button>
+        </div>
+    </div>
+
+    <!-- ACCORDION 2: AUDIO -->
+    <div class="ds-accordion" id="ds-accordion-audio">
+        <div class="ds-accordion-header ds-toggle-header">
+            <span>Add Audio Files</span>
+            <span class="ds-arrow"></span>
+        </div>
+        <div class="ds-accordion-body">
+            <div id="ds-audio-container">
+                <?php 
+                $audio_index = 0;
+                if ( ! empty( $audio_data ) ) {
+                    foreach ( $audio_data as $audio ) {
+                        ds_render_admin_audio_row( $audio_index, $audio );
+                        $audio_index++;
+                    }
+                }
+                ?>
+            </div>
+            <button type="button" class="ds-btn ds-btn-add" id="ds-add-audio-btn">+ Add New Audio</button>
+        </div>
+    </div>
+
+    <!-- ACCORDION 3: DAILY PRACTICE VIDEOS -->
+    <div class="ds-accordion" id="ds-accordion-videos">
+        <div class="ds-accordion-header ds-toggle-header">
+            <span>Add School Training Daily practice videos</span>
+            <span class="ds-arrow"></span>
+        </div>
+        <div class="ds-accordion-body">
+            <div id="ds-videos-container">
+                <?php 
+                $video_index = 0;
+                if ( ! empty( $video_data ) ) {
+                    foreach ( $video_data as $video ) {
+                        ds_render_admin_video_row( $video_index, $video );
+                        $video_index++;
+                    }
+                }
+                ?>
+            </div>
+            <button type="button" class="ds-btn ds-btn-add" id="ds-add-video-btn">+ Add New Video</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Accordion Toggles
+            const toggles = document.querySelectorAll('.ds-toggle-header');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    this.closest('.ds-accordion').classList.toggle('open');
+                });
+            });
+
+            // ==========================================
+            // 1. FILES UPLOADER LOGIC
+            // ==========================================
+            let fileIndex = <?php echo $file_index; ?>;
+            const filesContainer = document.getElementById('ds-files-container');
+            const addFileBtn = document.getElementById('ds-add-file-btn');
+
+            filesContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('ds-upload-file-btn')) {
+                    e.preventDefault();
+                    const urlInput = e.target.closest('.ds-upload-wrap').querySelector('.ds-file-url');
+                    const frame = wp.media({
+                        title: 'Select or Upload File',
+                        button: { text: 'Use this file' },
+                        multiple: false
+                    });
+                    frame.on('select', function() {
+                        const attachment = frame.state().get('selection').first().toJSON();
+                        urlInput.value = attachment.url;
+                    });
+                    frame.open();
+                }
+                if (e.target.classList.contains('ds-remove-file-row')) {
+                    if (confirm('Remove this file?')) {
+                        e.target.closest('.ds-row').remove();
+                    }
+                }
+            });
+
+            addFileBtn.addEventListener('click', function() {
+                const html = `
+                <div class="ds-row">
+                    <div class="ds-field ds-field-title">
+                        <label>Document Title *</label>
+                        <input type="text" name="ds_files[${fileIndex}][title]" required>
+                    </div>
+                    <div class="ds-field ds-field-file">
+                        <label>Upload File *</label>
+                        <div class="ds-upload-wrap">
+                            <input type="text" class="ds-file-url" name="ds_files[${fileIndex}][file_url]" required readonly placeholder="No file selected">
+                            <button type="button" class="ds-upload-btn ds-upload-file-btn">Select File</button>
+                        </div>
+                    </div>
+                    <div class="ds-field ds-field-tagline">
+                        <label>Tagline</label>
+                        <input type="text" name="ds_files[${fileIndex}][tagline]">
+                    </div>
+                    <button type="button" class="ds-btn ds-btn-remove ds-remove-file-row">Remove</button>
+                </div>`;
+                filesContainer.insertAdjacentHTML('beforeend', html);
+                fileIndex++;
+            });
+
+            // ==========================================
+            // 2. AUDIO UPLOADER LOGIC
+            // ==========================================
+            let audioIndex = <?php echo $audio_index; ?>;
+            const audioContainer = document.getElementById('ds-audio-container');
+            const addAudioBtn = document.getElementById('ds-add-audio-btn');
+
+            audioContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('ds-upload-audio-btn')) {
+                    e.preventDefault();
+                    const urlInput = e.target.closest('.ds-upload-wrap').querySelector('.ds-audio-url');
+                    const frame = wp.media({
+                        title: 'Select or Upload Audio',
+                        button: { text: 'Use this audio' },
+                        multiple: false,
+                        library: { type: 'audio' }
+                    });
+                    frame.on('select', function() {
+                        const attachment = frame.state().get('selection').first().toJSON();
+                        urlInput.value = attachment.url;
+                    });
+                    frame.open();
+                }
+                if (e.target.classList.contains('ds-remove-audio-row')) {
+                    if (confirm('Remove this audio file?')) {
+                        e.target.closest('.ds-row').remove();
+                    }
+                }
+            });
+
+            addAudioBtn.addEventListener('click', function() {
+                const html = `
+                <div class="ds-row">
+                    <div class="ds-field ds-field-audio-title">
+                        <label>Audio File Title *</label>
+                        <input type="text" name="ds_audios[${audioIndex}][title]" required>
+                    </div>
+                    <div class="ds-field ds-field-audio-file">
+                        <label>Upload Audio File *</label>
+                        <div class="ds-upload-wrap">
+                            <input type="text" class="ds-audio-url" name="ds_audios[${audioIndex}][audio_url]" required readonly placeholder="No audio selected">
+                            <button type="button" class="ds-upload-btn ds-upload-audio-btn">Select Audio</button>
+                        </div>
+                    </div>
+                    <button type="button" class="ds-btn ds-btn-remove ds-remove-audio-row">Remove</button>
+                </div>`;
+                audioContainer.insertAdjacentHTML('beforeend', html);
+                audioIndex++;
+            });
+
+            // ==========================================
+            // 3. DAILY PRACTICE VIDEOS LOGIC
+            // ==========================================
+            let videoIndex = <?php echo $video_index; ?>;
+            const videosContainer = document.getElementById('ds-videos-container');
+            const addVideoBtn = document.getElementById('ds-add-video-btn');
+
+            videosContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('ds-remove-video-row')) {
+                    if (confirm('Remove this video?')) {
+                        e.target.closest('.ds-row').remove();
+                    }
+                }
+            });
+
+            addVideoBtn.addEventListener('click', function() {
+                const html = `
+                <div class="ds-row">
+                    <div class="ds-field ds-field-video-title">
+                        <label>Video Title *</label>
+                        <input type="text" name="ds_videos[${videoIndex}][title]" required>
+                    </div>
+                    <div class="ds-field ds-field-video-url">
+                        <label>Video URL *</label>
+                        <input type="text" name="ds_videos[${videoIndex}][video_url]" required placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+                    <button type="button" class="ds-btn ds-btn-remove ds-remove-video-row">Remove</button>
+                </div>`;
+                videosContainer.insertAdjacentHTML('beforeend', html);
+                videoIndex++;
+            });
+        });
+    </script>
+    <?php
+}
+
+// Helper function to render existing FILE rows
+function ds_render_admin_file_row( $index, $file ) {
+    $title = isset( $file['title'] ) ? esc_attr( $file['title'] ) : '';
+    $url = isset( $file['file_url'] ) ? esc_attr( $file['file_url'] ) : '';
+    $tagline = isset( $file['tagline'] ) ? esc_attr( $file['tagline'] ) : '';
+    ?>
+    <div class="ds-row">
+        <div class="ds-field ds-field-title">
+            <label>Document Title *</label>
+            <input type="text" name="ds_files[<?php echo $index; ?>][title]" value="<?php echo $title; ?>" required>
+        </div>
+        <div class="ds-field ds-field-file">
+            <label>Upload File *</label>
+            <div class="ds-upload-wrap">
+                <input type="text" class="ds-file-url" name="ds_files[<?php echo $index; ?>][file_url]" value="<?php echo $url; ?>" required readonly placeholder="No file selected">
+                <button type="button" class="ds-upload-btn ds-upload-file-btn">Select File</button>
+            </div>
+        </div>
+        <div class="ds-field ds-field-tagline">
+            <label>Tagline</label>
+            <input type="text" name="ds_files[<?php echo $index; ?>][tagline]" value="<?php echo $tagline; ?>">
+        </div>
+        <button type="button" class="ds-btn ds-btn-remove ds-remove-file-row">Remove</button>
+    </div>
+    <?php
+}
+
+// Helper function to render existing AUDIO rows
+function ds_render_admin_audio_row( $index, $audio ) {
+    $title = isset( $audio['title'] ) ? esc_attr( $audio['title'] ) : '';
+    $url = isset( $audio['audio_url'] ) ? esc_attr( $audio['audio_url'] ) : '';
+    ?>
+    <div class="ds-row">
+        <div class="ds-field ds-field-audio-title">
+            <label>Audio File Title *</label>
+            <input type="text" name="ds_audios[<?php echo $index; ?>][title]" value="<?php echo $title; ?>" required>
+        </div>
+        <div class="ds-field ds-field-audio-file">
+            <label>Upload Audio File *</label>
+            <div class="ds-upload-wrap">
+                <input type="text" class="ds-audio-url" name="ds_audios[<?php echo $index; ?>][audio_url]" value="<?php echo $url; ?>" required readonly placeholder="No audio selected">
+                <button type="button" class="ds-upload-btn ds-upload-audio-btn">Select Audio</button>
+            </div>
+        </div>
+        <button type="button" class="ds-btn ds-btn-remove ds-remove-audio-row">Remove</button>
+    </div>
+    <?php
+}
+
+// Helper function to render existing VIDEO rows
+function ds_render_admin_video_row( $index, $video ) {
+    $title = isset( $video['title'] ) ? esc_attr( $video['title'] ) : '';
+    $url = isset( $video['video_url'] ) ? esc_attr( $video['video_url'] ) : '';
+    ?>
+    <div class="ds-row">
+        <div class="ds-field ds-field-video-title">
+            <label>Video Title *</label>
+            <input type="text" name="ds_videos[<?php echo $index; ?>][title]" value="<?php echo $title; ?>" required>
+        </div>
+        <div class="ds-field ds-field-video-url">
+            <label>Video URL *</label>
+            <input type="text" name="ds_videos[<?php echo $index; ?>][video_url]" value="<?php echo $url; ?>" required placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <button type="button" class="ds-btn ds-btn-remove ds-remove-video-row">Remove</button>
+    </div>
+    <?php
+}
+
+// 3. Save Meta Box Data
+function ds_save_materials_meta( $post_id ) {
+    if ( ! isset( $_POST['ds_materials_nonce'] ) || ! wp_verify_nonce( $_POST['ds_materials_nonce'], 'ds_save_materials' ) ) {
+        return;
+    }
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+        return;
+    }
+    if ( ! current_user_can( 'edit_page', $post_id ) ) {
+        return;
+    }
+
+    // --- Save Files ---
+    $saved_files = array();
+    if ( isset( $_POST['ds_files'] ) && is_array( $_POST['ds_files'] ) ) {
+        foreach ( $_POST['ds_files'] as $file ) {
+            $clean_title = isset( $file['title'] ) ? sanitize_text_field( $file['title'] ) : '';
+            $clean_url = isset( $file['file_url'] ) ? esc_url_raw( $file['file_url'] ) : '';
+            if ( empty( $clean_title ) || empty( $clean_url ) ) continue;
+            $saved_files[] = array(
+                'title'    => $clean_title,
+                'file_url' => $clean_url,
+                'tagline'  => isset( $file['tagline'] ) ? sanitize_text_field( $file['tagline'] ) : '',
+            );
+        }
+    }
+    update_post_meta( $post_id, '_ds_downloadable_materials', $saved_files );
+
+    // --- Save Audios ---
+    $saved_audios = array();
+    if ( isset( $_POST['ds_audios'] ) && is_array( $_POST['ds_audios'] ) ) {
+        foreach ( $_POST['ds_audios'] as $audio ) {
+            $clean_title = isset( $audio['title'] ) ? sanitize_text_field( $audio['title'] ) : '';
+            $clean_url = isset( $audio['audio_url'] ) ? esc_url_raw( $audio['audio_url'] ) : '';
+            if ( empty( $clean_title ) || empty( $clean_url ) ) continue;
+            $saved_audios[] = array(
+                'title'     => $clean_title,
+                'audio_url' => $clean_url,
+            );
+        }
+    }
+    update_post_meta( $post_id, '_ds_downloadable_audios', $saved_audios );
+
+    // --- Save Daily Practice Videos ---
+    $saved_videos = array();
+    if ( isset( $_POST['ds_videos'] ) && is_array( $_POST['ds_videos'] ) ) {
+        foreach ( $_POST['ds_videos'] as $video ) {
+            $clean_title = isset( $video['title'] ) ? sanitize_text_field( $video['title'] ) : '';
+            // Using sanitize_text_field for URL as requested type="text", but validating it looks like a URL
+            $clean_url = isset( $video['video_url'] ) ? sanitize_text_field( $video['video_url'] ) : '';
+            if ( empty( $clean_title ) || empty( $clean_url ) ) continue;
+            $saved_videos[] = array(
+                'title'     => $clean_title,
+                'video_url' => $clean_url,
+            );
+        }
+    }
+    update_post_meta( $post_id, '_ds_daily_practice_videos', $saved_videos );
+}
+add_action( 'save_post_page', 'ds_save_materials_meta' );
+
+// 4. Frontend Data Helper Functions
+function ds_get_downloadable_materials( $post_id = null ) {
+    $post_id = $post_id ?: get_the_ID();
+    if ( ! $post_id ) return array();
+    $data = get_post_meta( $post_id, '_ds_downloadable_materials', true );
+    return is_array( $data ) ? $data : array();
+}
+
+function ds_get_downloadable_audios( $post_id = null ) {
+    $post_id = $post_id ?: get_the_ID();
+    if ( ! $post_id ) return array();
+    $data = get_post_meta( $post_id, '_ds_downloadable_audios', true );
+    return is_array( $data ) ? $data : array();
+}
+
+function ds_get_daily_practice_videos( $post_id = null ) {
+    $post_id = $post_id ?: get_the_ID();
+    if ( ! $post_id ) return array();
+    $data = get_post_meta( $post_id, '_ds_daily_practice_videos', true );
+    return is_array( $data ) ? $data : array();
+}
