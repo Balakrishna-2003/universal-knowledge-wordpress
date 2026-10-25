@@ -4,15 +4,16 @@ dynamic page universal knowledge trust
 2. e-letters. -> Done. ( you can update the data in e-letters page)
 3. inspitantional videos. -> Done ( if you add post with category inspirational videos it will automatically added as card and as a single page/article).
 4. books and articles -> books, articles, gifts => Done ( for books, agnihotra materials and gift you just go to "books-and-articles" and you will the custom boxes for the books, agnihotra ... etc, for articles go to post add post under press release and any category under it to appear here and also in the press release).
-5. Activities
+5. universal talk => Done (if you want to add featured videos go to universal talk page and at below you will get cusom box for it).
+6. Activities
     |- Our Events
-    	|- All Our Events
-    |- spirituality and events
-    	|- Spirituality
+    	|- All Our Events => Done ( post under or the category named events).
+    |- spirituality and you
+    	|- Spirituality => Done ( if you want to add post here go to posts enter your details and select spirituality as category and publish).
     |- Training programs
-    	|- our training programs.
-    	|- all school training programs.
-    	|- downloads for school training programs.
+    	|- our training programs. => Done (add post under category as training).
+    	|- all school training programs. => Done (add post under training programs for school children).
+    	|- downloads for school training programs => 
     |- we support
     	|- we support
     |- Project green
@@ -30,11 +31,11 @@ dynamic page universal knowledge trust
     |- Press 
     	|-  Press Release => Done ( if you want to add the articles here go to post fill the details (title, description, thumbnail etc than check the category as press release or any under the press release). 
     |- Reviews on website.
-    	|- Reviews on website.
+    	|- Reviews on website => Done (edited files page-revi...php, functions.php).
     	|- Reviews on google map (not sure).
     |- Testimonials
     	|- Program testimonials.
-    	|- Video testimonials.
+    	|- Video testimonials => Done ( if you want to add the video go to video testimonials page and down below you can add it).
 8. Contact us
     |- contact us
 

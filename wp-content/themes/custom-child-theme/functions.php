@@ -57,6 +57,30 @@ function twentytwentyfive_child_enqueue_assets() {
 add_action('wp_enqueue_scripts', 'twentytwentyfive_child_enqueue_assets');
 
 
+/**
+ * Force allow PDF uploads and handle alternative MIME types.
+ */
+// function ukt_allow_pdf_uploads( $mimes ) {
+//     $mimes['pdf'] = 'application/pdf';
+//     $mimes['pdf'] = 'application/x-pdf';
+//     return $mimes;
+// }
+// add_filter( 'upload_mimes', 'ukt_allow_pdf_uploads' );
+
+/**
+ * Bypass strict real-mime check if the server misreads the PDF header.
+ */
+// add_filter( 'wp_check_filetype_and_ext', function( $filedata, $file, $filename, $mimes ) {
+//     $ext = pathinfo( $filename, PATHINFO_EXTENSION );
+//     if ( 'pdf' === strtolower( $ext ) ) {
+//         $filedata['ext']  = 'pdf';
+//         $filedata['type'] = 'application/pdf';
+//         $filedata['proper_filename'] = $filename;
+//     }
+//     return $filedata;
+// }, 10, 4 );
+
+
 
 /**
  * ============================================================================
@@ -457,7 +481,7 @@ function ukt_e_letters_metabox_render($post) {
                 
                 // 1. Allowed MIME types for the library filter
                 const allowedMimeTypes = [
-                    'application/pdf',
+                    'application/x-pdf',
                     'application/msword',
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
                     'application/vnd.ms-excel',
@@ -470,7 +494,7 @@ function ukt_e_letters_metabox_render($post) {
                     { 
                         title: 'Select E-Letter File', 
                         buttonText: 'Use This File',
-                        library: { type: allowedMimeTypes } // Filters the Media Library tab
+                         // Filters the Media Library tab
                     }, 
                     function (att) {
                         // 2. Strict Validation upon selection
@@ -979,7 +1003,7 @@ function ukt_ba_metabox_render($post) {
                     title: 'Select PDF File',
                     button: { text: 'Use This PDF' },
                     multiple: false,
-                    library: { type: 'application/pdf' }
+                    library: { type: 'application/x-pdf' }
                 });
                 frame.on('select', function() {
                     const att = frame.state().get('selection').first().toJSON();
@@ -988,7 +1012,7 @@ function ukt_ba_metabox_render($post) {
                     const fileName = att.filename || att.title || att.url.split('/').pop();
                     const fileExt = fileName.split('.').pop().toLowerCase();
                     
-                    if (att.mime !== 'application/pdf' || fileExt !== 'pdf') {
+                    if (att.mime !== 'application/x-pdf' || fileExt !== 'pdf') {
                         alert('Invalid file type! Please upload only PDF files.');
                         return;
                     }
@@ -2124,7 +2148,11 @@ function ut_get_featured_videos( $post_id = null ) {
 
 /* End of Universal Talk */
 
+
+
 /* Begin Downloads for school training programs */
+
+
 // 1. Add Meta Box
 function ds_add_materials_meta_box() {
     global $post;
@@ -2567,3 +2595,5 @@ function ds_get_daily_practice_videos( $post_id = null ) {
     $data = get_post_meta( $post_id, '_ds_daily_practice_videos', true );
     return is_array( $data ) ? $data : array();
 }
+
+

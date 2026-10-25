@@ -1,0 +1,1231 @@
+exact the character from the image and create an image for the below story
+"the poor dinosaur is hungry and is drinking water, but the former hits it and scared away"
+
+This is actually one of the most interesting parts of AI applications like ToonyStory. They almost certainly do not store the AI model itself or retrain it for each user. Instead, they store a combination of the original images, metadata, and AI-generated character information so they can recreate the character consistently.
+
+Here's how a typical pipeline works.
+
+Step 1: User uploads photos
+
+Suppose a user uploads three photos of their child.
+
+photo1.jpg
+photo2.jpg
+photo3.jpg
+
+These images are uploaded to cloud storage (such as Google Cloud Storage or Amazon S3).
+
+The database stores references to them:
+
+CharacterImages
+----------------------------
+id: 1
+character_id: 45
+image_url: s3://bucket/photo1.jpg
+
+id: 2
+character_id: 45
+image_url: s3://bucket/photo2.jpg
+
+id: 3
+character_id: 45
+image_url: s3://bucket/photo3.jpg
+
+The actual image files are not stored inside PostgreSQL.
+
+Step 2: AI analyzes the photos
+
+The uploaded photos are sent to an AI model (for example, Gemini Vision).
+
+The AI extracts descriptive information such as:
+
+hairstyle
+eye color
+skin tone
+facial shape
+clothing
+age estimate
+gender (if needed for the prompt)
+accessories
+
+It might produce something like:
+
+{
+  "hair": "short black hair",
+  "eyes": "dark brown",
+  "skin": "medium brown",
+  "shirt": "blue t-shirt",
+  "smile": "bright smile"
+}
+Step 3: Generate a character profile
+
+Instead of analyzing the photos every time, the application saves a structured character description.
+
+Example:
+
+{
+  "name": "Arjun",
+  "style": "Pixar",
+  "description": "A cheerful 7-year-old Indian boy with short black hair, dark brown eyes, medium brown skin, wearing a blue T-shirt and beige shorts."
+}
+
+Database:
+
+Characters
+-------------------------
+id
+user_id
+name
+style
+description
+created_at
+
+This description becomes the basis for future story generation.
+
+Step 4: Create an embedding (optional)
+
+Many AI systems generate an embedding, which is a numerical representation of the character's appearance.
+
+For example:
+
+[0.182,
+-0.043,
+0.591,
+...
+768 values]
+
+The embedding captures visual characteristics without storing the image itself.
+
+Database:
+
+CharacterEmbeddings
+-------------------------
+character_id
+embedding
+model_version
+
+Sometimes the embedding is stored directly in PostgreSQL using the pgvector extension. In other cases, it's stored in a dedicated vector database such as Pinecone, Weaviate, or Qdrant.
+
+Its purpose is to help retrieve or compare the character later.
+
+Step 5: Save the generation prompt
+
+A prompt template is also often stored.
+
+Example:
+
+Character Reference:
+
+A cheerful 7-year-old Indian boy
+
+Short black hair
+
+Dark brown eyes
+
+Blue shirt
+
+Pixar style
+
+Maintain facial consistency
+throughout every page.
+
+Table:
+
+CharacterPrompts
+-------------------------
+character_id
+prompt
+model
+
+This allows the application to regenerate images consistently without rebuilding the prompt each time.
+
+Step 6: Generate story illustrations
+
+When the user creates a new story:
+
+User clicks
+
+Create Story
+
+The system loads:
+
+original images (if needed)
+character description
+embedding (if used)
+prompt template
+
+Then sends something like:
+
+Story:
+
+Arjun goes to the jungle.
+
+Character Reference:
+
+7-year-old Indian boy
+
+Short black hair
+
+Blue shirt
+
+Keep same face.
+
+Scene:
+
+Walking with a baby elephant.
+
+to the image generation model.
+
+What is likely stored?
+
+A character record might look like this:
+
+{
+  "id": 52,
+  "userId": 1001,
+  "name": "Arjun",
+  "style": "Cartoon",
+  "description": "Indian boy with short black hair...",
+  "referenceImages": [
+      "https://storage/.../1.jpg",
+      "https://storage/.../2.jpg"
+  ],
+  "embeddingId": "emb_8329",
+  "promptTemplate": "...",
+  "createdAt": "2026-06-12"
+}
+
+Notice that the actual generated images are separate from the character definition.
+
+How do they keep the character consistent?
+
+This is the challenging part.
+
+A common approach combines several techniques:
+
+User Photos
+      │
+      ▼
+Vision AI
+      │
+      ▼
+Character Description
+      │
+      ├───────────────┐
+      ▼               ▼
+Embedding      Prompt Template
+      │               │
+      └──────┬────────┘
+             ▼
+      Image Generation AI
+             ▼
+      Story Illustrations
+
+Rather than relying only on a text prompt like "boy with black hair," the system uses richer information derived from the uploaded photos to guide generation.
+
+Why save the character instead of the generated images?
+
+Imagine a user creates ten different books.
+
+Without a saved character, the user would have to:
+
+upload photos again
+wait for analysis again
+risk the AI interpreting the photos differently each time
+
+By storing a reusable character profile, the system can generate new stories with the same character much more efficiently and consistently.
+
+For a product like ToonyStory
+
+Based on its publicly described capabilities and common architecture for AI storybook platforms, it's reasonable to infer that they store:
+
+The original uploaded reference photos (in cloud object storage).
+A character record with metadata (name, style, description).
+An AI-generated textual description of the person's appearance.
+A reusable prompt or template for future image generation.
+Potentially an embedding or other internal representation to improve consistency (the exact mechanism is not publicly documented).
+Links to generated illustrations, books, and videos associated with that character.
+
+The exact implementation is proprietary, but this architecture is widely used because it balances storage efficiency, generation speed, and character consistency across multiple stories.
+
+how exactly the story is generated like how the data fetched, how the prompt would be used how the images where placed in the prompt and etc.
+
+This is the core engineering behind an AI storybook platform like ToonyStory. The exact implementation is proprietary, but based on how modern AI storytelling systems are built, the workflow would look something like this.
+
+The important thing to understand is:
+
+The story text and the illustrations are usually generated separately.
+
+A typical pipeline:
+
+User Input
+    |
+    |
+    ▼
+Character Data Retrieval
+    |
+    |
+    ▼
+Story Generation (LLM)
+    |
+    |
+    ▼
+Scene Breakdown
+    |
+    |
+    ▼
+Image Prompt Generation
+    |
+    |
+    ▼
+Image Generation Model
+    |
+    |
+    ▼
+Book Layout Engine
+    |
+    |
+    ▼
+PDF / Video / Print
+
+Let's go step by step.
+
+1. User starts story creation
+
+Example:
+
+User selects:
+
+Theme:
+Adventure
+
+Character:
+Aarav
+
+Story idea:
+"Aarav explores a magical forest with a friendly elephant"
+
+Style:
+Disney-like cartoon
+
+Pages:
+10
+
+The frontend sends an API request:
+
+POST /api/create-story
+
+Payload:
+
+{
+  "characterId": "char_123",
+  "theme": "Adventure",
+  "idea": "Aarav explores a magical forest",
+  "pages": 10,
+  "style": "cartoon"
+}
+2. Backend fetches character information
+
+The backend receives:
+
+characterId = char_123
+
+It queries the database.
+
+Example:
+
+SELECT *
+FROM characters
+WHERE id='char_123';
+
+Database returns:
+
+{
+"id":"char_123",
+"name":"Aarav",
+"description":
+"7 year old Indian boy,
+short black hair,
+brown eyes,
+round face,
+wearing blue kurta",
+
+"style":"3D cartoon",
+
+"reference_images":[
+"https://storage.com/a.jpg",
+"https://storage.com/b.jpg"
+]
+}
+
+Now the AI system knows who the character is.
+
+3. Fetch user preferences
+
+The system may also fetch:
+
+User preferences
+SELECT *
+FROM preferences
+WHERE user_id='user_10'
+
+Example:
+
+{
+"language":"English",
+"age_group":"5-8",
+"favorite_theme":"animals"
+}
+4. Build the story generation prompt
+
+Now the backend creates a prompt for the LLM.
+
+The prompt is NOT just:
+
+Write a story about Aarav
+
+It is much more structured.
+
+Example:
+
+SYSTEM:
+
+You are an expert children's book writer.
+
+Rules:
+- Write simple language
+- Suitable for children aged 5-8
+- Create emotional storytelling
+- Include a moral lesson
+- Divide story into exactly 10 pages
+
+
+CHARACTER INFORMATION:
+
+Name:
+Aarav
+
+Age:
+7
+
+Appearance:
+Indian boy.
+Short black hair.
+Brown eyes.
+Round face.
+Blue kurta.
+
+
+USER REQUEST:
+
+Theme:
+Adventure
+
+Story idea:
+Aarav explores a magical forest.
+
+
+OUTPUT FORMAT:
+
+Return JSON.
+
+{
+page_number:"",
+text:"",
+scene_description:""
+}
+
+5. LLM generates structured story
+
+The AI returns:
+
+{
+"title":"Aarav and the Magical Forest",
+
+"pages":[
+
+{
+"page":1,
+
+"text":
+"Aarav woke up early and entered the magical forest.",
+
+"scene":
+"Aarav standing near a forest entrance"
+},
+
+
+{
+"page":2,
+
+"text":
+"He saw a small elephant trapped near a river.",
+
+"scene":
+"Aarav helping a baby elephant near water"
+}
+
+]
+}
+
+Notice:
+
+The AI generates:
+
+Text for the child
+Visual description for the illustrator AI
+6. Store story in database
+
+The backend saves:
+
+Stories table
+Stories
+
+id
+user_id
+character_id
+title
+status
+created_at
+
+Example:
+
+story_555
+user_10
+char_123
+"Aarav Magical Forest"
+generating
+Story pages table
+StoryPages
+
+id
+story_id
+page_number
+text
+scene_description
+
+Example:
+
+page_1
+
+Text:
+"Aarav woke up..."
+
+Scene:
+"Aarav standing in forest"
+7. Generate image prompts
+
+Now comes the important part.
+
+The system combines:
+
+character information
+scene description
+art style
+
+Example:
+
+Character:
+
+Aarav:
+7 year old Indian boy
+short black hair
+brown eyes
+blue kurta
+
+Scene:
+
+Aarav helping baby elephant near river
+
+Style:
+
+3D animated children's book style
+
+The final image prompt:
+
+Create a children's book illustration.
+
+Character:
+A 7 year old Indian boy named Aarav.
+Short black hair.
+Brown eyes.
+Round face.
+Blue kurta.
+
+Scene:
+Aarav is standing beside a river
+helping a baby elephant.
+
+Environment:
+Magical green forest.
+Colorful flowers.
+Warm sunlight.
+
+Style:
+High quality 3D cartoon illustration.
+
+Important:
+Keep Aarav's face identical to the reference character.
+Maintain character consistency.
+8. How are images placed into the prompt?
+
+There are several approaches.
+
+Method 1: Image + Text Prompt
+
+Modern multimodal image models accept:
+
+IMAGE:
+(reference photo)
+
++
+TEXT:
+
+"Create a cartoon illustration
+of this same child
+in a magical forest"
+
+The request becomes:
+
+[
+ {
+  type:"image",
+  url:"character_reference.jpg"
+ },
+
+ {
+  type:"text",
+  content:
+  "Create Aarav helping elephant"
+ }
+]
+
+The AI sees:
+
+Reference Image
+
+      +
+      
+Description
+
+      ↓
+
+Generated Illustration
+Method 2: Character Embedding
+
+More advanced systems:
+
+First:
+
+Photo
+ |
+AI Encoder
+ |
+Embedding Vector
+
+Example:
+
+[
+0.234,
+0.812,
+-0.332,
+...
+]
+
+Stored:
+
+character_embedding
+
+During generation:
+
+Embedding
++
+Prompt
++
+Scene
+
+goes to the image model.
+
+This helps maintain identity.
+
+Method 3: Fine-tuning / LoRA
+
+Some systems train a small custom model.
+
+Example:
+
+User uploads:
+
+10 photos of Aarav
+
+System creates:
+
+Aarav_LoRA_Model
+
+Then generation:
+
+Prompt:
+
+Aarav playing cricket
+
++
+Aarav_LoRA
+
+Output:
+
+Same Aarav
+
+This is expensive, so startups usually avoid this initially.
+
+9. Image generation request
+
+Backend sends:
+
+Example API request:
+
+{
+"prompt":
+
+"Children's book illustration.
+Aarav helping baby elephant.
+Maintain character identity.",
+
+"reference_image":
+
+"https://storage.com/aarav.jpg",
+
+"size":
+"1024x1024"
+}
+
+AI returns:
+
+image_url:
+
+https://storage.com/generated/page1.png
+10. Save generated images
+
+Database:
+
+StoryImages
+
+id
+page_id
+image_url
+prompt_used
+model
+created_at
+
+Example:
+
+page_1
+
+image:
+page1.png
+
+prompt:
+"Aarav helping elephant"
+
+model:
+Gemini Image
+11. Book assembly
+
+Now the system has:
+
+Page 1
+
+Text:
+"Aarav entered the forest"
+
+Image:
+page1.png
+
+
+Page 2
+
+Text:
+"He found an elephant"
+
+Image:
+page2.png
+
+A rendering engine creates:
+
+PDF:
+
+-------------------
+
+[ IMAGE ]
+
+Aarav entered
+the magical forest.
+
+-------------------
+
+Tools commonly used:
+
+Puppeteer
+PDFKit
+React PDF
+HTML → PDF conversion
+12. Narration generation
+
+Optional:
+
+Text:
+
+Aarav entered the magical forest...
+
+sent to:
+
+Text-to-Speech API
+
+Output:
+
+audio_page1.mp3
+
+Database:
+
+AudioFiles
+
+page_id
+audio_url
+Complete Architecture
+                 USER
+
+                  |
+                  |
+             Next.js App
+
+                  |
+
+              Backend API
+
+                  |
+
+        ---------------------
+        |                   |
+        ▼                   ▼
+
+   PostgreSQL            Storage
+   (Neon)                (Images)
+
+        |
+        |
+        ▼
+
+ Character Data
+ Story Data
+ Orders
+
+
+        |
+        ▼
+
+
+       AI Layer
+
+  ----------------
+
+  Gemini Text
+       |
+       |
+  Story JSON
+
+
+       |
+       ▼
+
+  Image Prompt Builder
+
+
+       |
+       ▼
+
+
+  Gemini Image Model
+
+
+       |
+       ▼
+
+
+ Generated Pages
+
+
+       |
+       ▼
+
+
+ PDF Generator
+
+
+       |
+       ▼
+
+
+ Print Provider
+In short
+
+The magic is not a single AI call. It is a pipeline:
+
+Store the user's character profile.
+Retrieve character information.
+Ask an LLM to create a structured story.
+Convert each page into an image description.
+Combine character reference + scene prompt.
+Generate illustrations.
+Store pages/images.
+Assemble everything into a book.
+
+The hardest engineering problem is not story generation — LLMs are already very good at that. The hardest problem is maintaining the same character identity across 20–50 generated illustrations, which requires reference images, embeddings, prompt engineering, or specialized fine-tuning techniques.
+
+when is the image store in the database
+
+Good question. In an AI storybook system like ToonyStory, the image is usually not stored in the database at the moment it is generated. The actual image file and the database record are created in two separate steps.
+
+Let's walk through the exact lifecycle.
+
+Image storage lifecycle
+Step 1: User uploads original photo
+
+Example:
+
+User uploads:
+
+aarav_photo.jpg
+
+The application receives the file.
+
+Flow:
+
+Browser
+   |
+   |
+   ▼
+Next.js Server
+   |
+   |
+   ▼
+Cloud Storage
+(S3 / Google Cloud Storage)
+
+The image is stored in object storage:
+
+storage/
+ └── users/
+      └── user_123/
+           └── characters/
+                └── aarav_photo.jpg
+
+Then the database stores only the reference:
+
+Database
+
+character_images
+
+id	character_id	image_url
+1	char_101	https://storage.com/aarav_photo.jpg
+
+The database does not store:
+
+(binary image data)
+
+because images are large.
+
+Step 2: AI creates the character
+
+The AI analyzes the image.
+
+Input:
+
+aarav_photo.jpg
+
+AI generates:
+
+Character Description:
+
+7 year old Indian boy
+Short black hair
+Brown eyes
+Blue kurta
+Round face
+
+Database stores:
+
+characters
+
+{
+"id":"char_101",
+"name":"Aarav",
+"description":
+"7 year old Indian boy with short black hair...",
+"reference_image":
+"https://storage.com/aarav_photo.jpg"
+}
+
+Still no generated story images yet.
+
+Step 3: User creates a story
+
+Example:
+
+Aarav visits a magical forest
+
+The system generates:
+
+Page 1:
+Aarav enters the forest
+
+Page 2:
+Aarav meets a baby elephant
+
+Page 3:
+Aarav helps the elephant
+
+At this stage:
+
+Database:
+
+Stories
+ |
+ └── Story Pages
+
+but:
+
+image_url = NULL
+
+Example:
+
+page	text	image
+1	Aarav enters forest	NULL
+2	Aarav meets elephant	NULL
+Step 4: Image generation starts
+
+Now the backend creates an image prompt.
+
+Example:
+
+Character:
+Aarav, 7 year old Indian boy,
+short black hair,
+blue kurta
+
+Scene:
+Aarav walking in magical forest
+
+Style:
+Children's storybook illustration
+
+The request goes to the image model.
+
+Example:
+
+Gemini Image API
+       |
+       |
+       ▼
+Generated Image
+
+The AI returns:
+
+https://temporary-url.com/generated123.png
+Step 5: Image is saved to storage
+
+Before saving into the database, the application downloads/copies the generated image.
+
+Example:
+
+Temporary AI output:
+
+https://ai-provider.com/result.png
+
+is copied to:
+
+Your Storage Bucket
+
+storage/
+ |
+ └── stories/
+      |
+      └── story_500/
+           |
+           ├── page_1.png
+           ├── page_2.png
+           └── page_3.png
+
+Now the image has permanent storage.
+
+Step 6: Database record is created/updated
+
+Only after the image is safely stored, the database is updated.
+
+Example:
+
+Before:
+
+story_pages
+
+page	text	image_url
+1	Aarav enters forest	NULL
+
+After:
+
+page	text	image_url
+1	Aarav enters forest	storage/story_500/page_1.png
+
+Database:
+
+UPDATE story_pages
+SET image_url='storage/story_500/page_1.png'
+WHERE id='page_1';
+Complete timeline
+USER UPLOADS PHOTO
+        |
+        ▼
+Store original photo
+        |
+        ▼
+Database saves photo URL
+        |
+        ▼
+Generate character profile
+        |
+        ▼
+Save character data
+        |
+        ▼
+Generate story text
+        |
+        ▼
+Save story pages
+        |
+        ▼
+Generate illustration
+        |
+        ▼
+Save generated image file
+        |
+        ▼
+Save image URL in database
+        |
+        ▼
+Book assembly
+Typical database tables
+Character images
+
+Stores uploaded reference images.
+
+character_images
+
+id
+character_id
+image_url
+type
+created_at
+
+Example:
+
+1
+char_101
+/users/aarav/photo1.jpg
+reference
+Story pages
+
+Stores generated illustrations.
+
+story_pages
+
+id
+story_id
+page_number
+text
+image_url
+
+Example:
+
+page_01
+
+Text:
+"Aarav entered the forest"
+
+Image:
+stories/story500/page1.png
+Generated assets table (common in AI apps)
+
+Some systems create a separate table:
+
+assets
+
+id
+user_id
+type
+url
+model
+prompt
+status
+created_at
+
+Example:
+
+type	url	status
+image	story1/page1.png	completed
+audio	story1/page1.mp3	completed
+pdf	book1.pdf	completed
+Why not directly store the image in PostgreSQL?
+
+Technically you can:
+
+CREATE TABLE images (
+ id INT,
+ image BYTEA
+);
+
+But AI applications usually avoid it because:
+
+❌ Database becomes huge
+❌ Backups become expensive
+❌ Slower queries
+❌ Harder CDN delivery
+
+Instead:
+
+Database
+   |
+   | stores metadata
+   |
+   ▼
+
+Cloud Storage
+   |
+   | stores actual files
+   |
+   ▼
+
+Images/Videos/PDFs
+In a production system like ToonyStory, the likely flow is:
+Gemini Image API
+        |
+        ▼
+Generated Image
+        |
+        ▼
+Cloud Storage
+(GCS/S3)
+        |
+        ▼
+Neon PostgreSQL
+
+story_images table:
+
+id
+story_id
+page_number
+image_url
+prompt
+model
+created_at
+
+So the answer is:
+
+The image is stored in the database only after the AI image generation finishes, the image is uploaded/copied into permanent storage, and then the database saves the URL and metadata pointing to that image. The database stores the "address and information about the image", not usually the image file itself.
