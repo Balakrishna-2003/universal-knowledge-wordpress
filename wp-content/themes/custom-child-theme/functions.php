@@ -2551,6 +2551,7 @@ function ds_save_materials_meta( $post_id ) {
             $saved_audios[] = array(
                 'title'     => $clean_title,
                 'audio_url' => $clean_url,
+                'date_added'    => current_time( 'mysql' ),
             );
         }
     }
@@ -2597,3 +2598,103 @@ function ds_get_daily_practice_videos( $post_id = null ) {
 }
 
 
+
+
+/*End of download for school training programs */
+
+
+/**
+ * ============================================================================
+ * EXTERNAL ARTICLE FETCHER (TinyMCE Button + PHP Array Generator)
+ * ============================================================================
+ */
+
+// 1. Add the custom button to the Classic Editor toolbar (First row)
+add_filter('mce_buttons', function($buttons) {
+    array_push($buttons, 'external_article_btn');
+    return $buttons;
+}, 999); // High priority to ensure it runs last
+
+// 1b. (Fallback) Add to the Second row just in case the first row is full
+add_filter('mce_buttons_2', function($buttons) {
+    array_push($buttons, 'external_article_btn');
+    return $buttons;
+}, 999);
+
+// 2. Load the JS file into TinyMCE
+add_filter('mce_external_plugins', function($plugin_array) {
+    $plugin_array['external_article_btn'] = get_stylesheet_directory_uri() . '/js/article-button.js';
+    return $plugin_array;
+});
+
+// 3. Create a dummy shortcode so the editor keeps the URL in the post content
+add_shortcode('article_data', function($atts) {
+    return ''; // Outputs nothing visually, just holds the data
+});
+
+function ukt_get_posts_by_slugs_array( $slugs_string ) {
+    $articles_array = array();
+    if ( empty( $slugs_string ) ) return $articles_array;
+
+    // Convert comma-separated string into a clean array of slugs
+    $slugs = array_map( 'trim', explode( ',', $slugs_string ) );
+
+    // Query the posts
+    $args = array(
+        'post_type'      => 'post', // Change to 'page' or custom post type if needed
+        'post_name__in'  => $slugs,
+        'posts_per_page' => -1,
+        'post_status'    => 'publish',
+    );
+    
+    $query = new WP_Query( $args );
+    
+    if ( $query->have_posts() ) {
+        while ( $query->have_posts() ) {
+            $query->the_post();
+            
+            // Get featured image
+            $thumbnail_url = get_the_post_thumbnail_url( get_the_ID(), 'large' );
+            
+            // Build the array
+            $articles_array[] = array(
+                'title'         => get_the_title(),
+                'content'       => wp_trim_words( get_the_excerpt(), 30 ), 
+                'thumbnail_url' => $thumbnail_url ? $thumbnail_url : '',
+                'date'          => get_the_date( 'M j, Y' ),
+                'url'           => get_permalink(),
+            );
+        }
+        wp_reset_postdata();
+    }
+    
+    return $articles_array;
+}
+
+
+
+
+
+// registering menu 
+add_action('after_setup_theme', function() {
+    register_nav_menus(array(
+        'our_events'    => 'Activities - Our Events',
+        'spiritualty_and_you' => 'Activities - Spirituality and you',
+        'training_programs' => 'Activities - Training Programs',
+        'we_support' => 'Activities - We Support',
+        'project_green' => 'Activities - Project Green',
+
+        'healing' => 'Healing Solutions - Healing',
+        'parivarthan_app' => 'Healing Solutions - Parivarthan app',
+        'healing_locations' => 'Healing Solutions - Healing Locations',
+        'spiritual_resources' => 'Healing Solutions - Spititual Resources',
+
+        'press' => 'Reviews & Testimonials - Press',
+        'reviews' => 'Reviews & Testimonials - reviews',
+        'testimonials' => 'Reviews & Testimonials - Testionials',
+    
+        'faq-and-reading' => 'FAQ & Reading',
+
+        'contact-us' => 'Contact Us'
+    ));
+});

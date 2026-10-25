@@ -5,77 +5,11 @@ $pdfs = ds_get_downloadable_materials();
 $audios = ds_get_downloadable_audios();
 $videos = ds_get_daily_practice_videos();
 
-// echo '<span class="text-center">' . $extension . '</span>';
-
-
 ?>
 
 <article>
 
-    <!-- =========================================================
-         E-LETTERS BANNER / HERO SECTION
-         (Matches index.html showcase hero layout)
-    ========================================================== -->
-    <section class="ukt-hero-showcase">
-        <div class="ukt-hero-slide-layout">
-            <div class="container-fluid">
-                <div class="row g-0 align-items-stretch">
-
-                    <!-- LEFT CONTENT AREA -->
-                    <div class="col-lg-5 d-flex align-items-center">
-                        <div class="ukt-hero-copy-zone">
-                            <div class="ukt-hero-left-decoration"></div>
-
-                            <div class="ukt-hero-slide-kicker">
-                                Universal Knowledge Trust
-                            </div>
-
-                            <h1 class="ukt-hero-main-title">
-                                <span>Downloads for School</span>
-                                <span>Training Program</span>
-                            </h1>
-
-                            <div class="ukt-hero-script-line">
-                                From Universal Knowledge
-                            </div>
-
-                            <p class="ukt-hero-description">
-                                This programme can bring great results immediately and the details of which are as mentioned in the brochure below. Submit your details if interested in participating. Submission form is at <a href="universal-knowledge-trust-training-programs.html">Training Programs</a>
-                            </p>
-
-                            <div class="ukt-hero-action-row">
-                                <a href="#training-downloads" class="ukt-hero-primary-action">
-                                    Download Resources
-                                    <i class="bi bi-cloud-arrow-down"></i>
-                                </a>
-                                <a href="#training-audios" class="ukt-hero-secondary-action">
-                                    Audio Sessions
-                                    <i class="bi bi-headphones"></i>
-                                </a>
-                                <a href="#training-videos" class="ukt-hero-secondary-action">
-                                    Watch Videos
-                                    <i class="bi bi-play-circle"></i>
-                                </a>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- RIGHT IMAGE AREA -->
-                    <div class="col-lg-7">
-                        <div class="ukt-hero-visual-zone">
-                            <div class="ukt-hero-image-frame">
-                                <img src="images/download-for-school-training-program-banner.png"
-                                    alt="Downloads for School Training Program - UKT"
-                                    title="Downloads for School Training Program - UKT" loading="eager">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
+    <?php get_template_part('page-banners'); ?>
 
     <!-- =========================================================
          SECTION 1: DOWNLOADS & TRAINING MATERIALS (PDF & EXCEL)
@@ -338,7 +272,55 @@ default:
             <!-- Audio Cards Grid -->
             <div class="row g-4 justify-content-center">
 
-                <div class="col-lg-8 col-md-10 col-12">
+                <?php 
+                    if(!empty($audios)){
+                        foreach($audios as $audio){
+                            $url_path = parse_url($audio['audio_url'], PHP_URL_PATH);
+                            $date = date( 'F j, Y', strtotime( $audio['date_added'] ) );
+                            $extension = strtolower(
+                                pathinfo($url_path ?? '', PATHINFO_EXTENSION)
+                            );
+                            ?>
+                                <div class="col-lg-8 col-md-10 col-12">
+                    <div class="ukt-audio-player-card">
+                        <div class="ukt-audio-card-accent"></div>
+
+                        <div class="ukt-audio-top-row">
+                            <div class="ukt-audio-icon-wrap">
+                                <i class="bi bi-soundwave"></i>
+                            </div>
+                            <div class="ukt-audio-meta-info">
+                                <span class="ukt-audio-pill">Recorded Session</span>
+                                <h3 class="ukt-audio-card-title"><?php echo $audio['title'];?></h3>
+                                <span class="ukt-audio-meta-sub">Audio <?php echo $extension; ?> • Recorded on <?php echo $date; ?></span>
+                            </div>
+                        </div>
+
+                        <div class="ukt-audio-player-container">
+                            <audio controls preload="metadata" class="w-100 ukt-custom-audio-player">
+                                <source src="<?php echo $audio['audio_url'];?>" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+
+                        <div class="ukt-audio-footer-row">
+                            <span class="ukt-audio-note">
+                                <i class="bi bi-info-circle me-1"></i> Stream online or download for offline classroom listening.
+                            </span>
+                            <a href="<?php echo $audio['audio_url'];?>"
+                                download="<?php echo $audio['audio_url'];?>"
+                                class="ukt-dl-btn ukt-dl-btn-purple" title="Download Audio File">
+                                <i class="bi bi-download"></i> Download Audio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                            <?php
+                        }
+                    }
+                ?>
+
+                <!-- <div class="col-lg-8 col-md-10 col-12">
                     <div class="ukt-audio-player-card">
                         <div class="ukt-audio-card-accent"></div>
 
@@ -371,7 +353,7 @@ default:
                             </a>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
             </div>
 
@@ -400,8 +382,56 @@ default:
             <!-- Video Cards Grid (6 Daily Practice Videos, 2 per row on desktop) -->
             <div class="row g-4 justify-content-center">
 
+                <?php 
+                    if(!empty($videos)){
+                        foreach($videos as $video){
+                            $title = $video['title'];
+                            $video_id = ukt_get_youtube_thumbnail($video['video_url']);
+
+                            ?>
+                                <div class="col-lg-6 col-md-6 col-12">
+                    <div class="ukt-video-item-card">
+                        <div class="ukt-video-thumb-frame" data-yt-id="<?php echo $video_id;?>"
+                            title="Click to play video inline">
+                            <img src="https://img.youtube.com/vi/<?php echo $video_id;?>/hqdefault.jpg"
+                                alt="Monday Practice Session - UKT School Training"
+                                class="ukt-video-thumb-img" loading="lazy">
+
+                            <div class="ukt-video-watermark-top">
+                                <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/universal-knowledge-trust-logo.png" alt="UKT Logo">
+                                <span class="ukt-video-watermark-title">Universal Knowledge • <?php echo $title;?></span>
+                            </div>
+
+                            <div class="ukt-video-play-button" aria-label="Play Video">
+                                <svg viewBox="0 0 68 48" width="56" height="39">
+                                    <path
+                                        d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z"
+                                        fill="#ff0000"></path>
+                                    <path d="M 45,24 27,14 27,34" fill="#ffffff"></path>
+                                </svg>
+                            </div>
+
+                            <div class="ukt-video-bottom-strip">
+                                <span class="ukt-video-channel-pill"><i class="bi bi-flower1"></i> UKT Training</span>
+                                <a href="https://www.youtube.com/watch?v=<?php echo $video_id;?>" target="_blank" rel="noopener noreferrer"
+                                    class="ukt-video-watch-link" onclick="event.stopPropagation();">
+                                    Watch on <i class="bi bi-youtube text-danger"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="ukt-video-content">
+                            <h3 class="ukt-video-title mb-0"><?php echo $title; ?></h3>
+                        </div>
+                    </div>
+                </div>
+                            <?php
+                        }
+                    }
+                ?>
+
                 <!-- Video Card 1: Monday Practice Session -->
-                <div class="col-lg-6 col-md-6 col-12">
+                <!-- <div class="col-lg-6 col-md-6 col-12">
                     <div class="ukt-video-item-card">
                         <div class="ukt-video-thumb-frame" data-yt-id="9ZxfNvPe8jI"
                             title="Click to play video inline">
@@ -436,10 +466,10 @@ default:
                             <h3 class="ukt-video-title mb-0">Monday Practice Session</h3>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Video Card 2: Tuesday Practice Session -->
-                <div class="col-lg-6 col-md-6 col-12">
+                <!-- <div class="col-lg-6 col-md-6 col-12">
                     <div class="ukt-video-item-card">
                         <div class="ukt-video-thumb-frame" data-yt-id="DeqoA149NDo"
                             title="Click to play video inline">
@@ -474,10 +504,10 @@ default:
                             <h3 class="ukt-video-title mb-0">Tuesday Practice Session</h3>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Video Card 3: Wednesday Practice Session -->
-                <div class="col-lg-6 col-md-6 col-12">
+                <!-- <div class="col-lg-6 col-md-6 col-12">
                     <div class="ukt-video-item-card">
                         <div class="ukt-video-thumb-frame" data-yt-id="iD6MTVXyR3w"
                             title="Click to play video inline">
@@ -512,10 +542,10 @@ default:
                             <h3 class="ukt-video-title mb-0">Wednesday Practice Session</h3>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Video Card 4: Thursday Practice Session -->
-                <div class="col-lg-6 col-md-6 col-12">
+                <!-- <div class="col-lg-6 col-md-6 col-12">
                     <div class="ukt-video-item-card">
                         <div class="ukt-video-thumb-frame" data-yt-id="1ho0cfxH960"
                             title="Click to play video inline">
@@ -550,10 +580,10 @@ default:
                             <h3 class="ukt-video-title mb-0">Thursday Practice Session</h3>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Video Card 5: Friday Practice Session -->
-                <div class="col-lg-6 col-md-6 col-12">
+                <!-- <div class="col-lg-6 col-md-6 col-12">
                     <div class="ukt-video-item-card">
                         <div class="ukt-video-thumb-frame" data-yt-id="3dWXb3bpA4I"
                             title="Click to play video inline">
@@ -588,10 +618,10 @@ default:
                             <h3 class="ukt-video-title mb-0">Friday Practice Session</h3>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Video Card 6: Saturday Practice Session -->
-                <div class="col-lg-6 col-md-6 col-12">
+                <!-- <div class="col-lg-6 col-md-6 col-12">
                     <div class="ukt-video-item-card">
                         <div class="ukt-video-thumb-frame" data-yt-id="X0ekRm011g0"
                             title="Click to play video inline">
@@ -626,7 +656,7 @@ default:
                             <h3 class="ukt-video-title mb-0">Saturday Practice Session</h3>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
             </div>
 
@@ -668,7 +698,7 @@ default:
 
                         <div class="ukt-cta-actions">
 
-                            <a href="about-us.html" class="ukt-cta-primary-btn" title="About Us">
+                            <a href="<?php echo home_url('about-us');?>" class="ukt-cta-primary-btn" title="About Us">
                                 <span>ABOUT US</span>
                                 <i class="bi bi-arrow-up-right"></i>
                             </a>
