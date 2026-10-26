@@ -10,8 +10,8 @@ dynamic page universal knowledge trust
     |- spirituality and events
     	|- Spirituality
     |- Training programs
-    	|- our training programs.
-    	|- all school training programs.
+    	|- our training programs. => Done (if you want to add articles here go to post fill the details (title, description, thumbnail etc) than check the category as  training programs and publish it).
+    	|- all school training programs. => Done (if you want to add articles here go to post fill the details (title, description, thumbnail etc) than check the category as  training programs for school childrens and publish it).
     	|- downloads for school training programs.
     |- we support
     	|- we support
@@ -28,7 +28,7 @@ dynamic page universal knowledge trust
     	|- mantra downloads
 7. Reviews & Testimonials
     |- Press 
-    	|-  Press Release => Done ( if you want to add the articles here go to post fill the details (title, description, thumbnail etc than check the category as press release or any under the press release). 
+    	|-  Press Release => Done ( if you want to add the articles here go to post fill the details (title, description, thumbnail etc) than check the category as press release or any under the press release). 
     |- Reviews on website.
     	|- Reviews on website.
     	|- Reviews on google map (not sure).
