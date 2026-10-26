@@ -17087,6 +17087,7 @@ button {
     color: #111827;
     margin: 0 0 3px 0;
     line-height: 1.35;
+    text-transform: capitalize;
 }
 
 .ukt-dl-meta {
@@ -17229,6 +17230,7 @@ button {
     color: #111827;
     margin: 0 0 2px 0;
     line-height: 1.35;
+    text-transform: capitalize;
 }
 
 .ukt-audio-meta-sub {
@@ -19636,7 +19638,7 @@ iframe.wp-embedded-content {
     position: relative;
     background: #ffffff;
     overflow: hidden;
-    min-height: 320px;
+    /* min-height: 320px; */
 }
 
 @media (min-width: 768px) {
@@ -20066,6 +20068,7 @@ body.ukt-print-body {
     line-height: 1.2;
     font-weight: 400;
     letter-spacing: -0.01em;
+    text-transform: capitalize;
 }
 
 .ukt-badge-category-blue {

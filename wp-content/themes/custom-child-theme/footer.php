@@ -43,17 +43,17 @@
         ============================================== -->
         <nav class="ukt-luxury-footer-nav">
 
-            <a href="index.html" class="ukt-footer-active">Home</a>
-            <a href="about-us.html">About Us</a>
-            <a href="e-letters.html">E-Letter</a>
-            <a href="inspirational-videos.html"> Inspirational Videos</a>
-            <a href="books-and-articles.html">Books & Articles</a>
-            <a href="universal-talk.html">Universal Talk</a>
-            <a href="karnataka-agnihotra-spectacular.html">Activities</a>
-            <a href="self-healing.html">Healing Solutions</a>
-            <a href="reviews-on-website.html">Reviews & Testimonials</a>
-            <a href="faq-npeh-shig.html">FAQ & Reading</a>
-            <a href="contact.html">Contact Us</a>
+            <a href="<?php echo home_url(); ?>" class="ukt-footer-active">Home</a>
+            <a href="<?php echo home_url('/about-us');?>">About Us</a>
+            <a href="<?php echo home_url('e-letter');?>">E-Letter</a>
+            <a href="<?php echo home_url('/inspirational-videos');?>"> Inspirational Videos</a>
+            <a href="<?php echo home_url('books-and-articles');?>">Books & Articles</a>
+            <a href="<?php echo home_url('universal-talk');?>">Universal Talk</a>
+            <a href="<?php echo home_url('karnataka-agnihotra-spectacular');?>">Activities</a>
+            <a href="<?php echo home_url('self-healing');?>">Healing Solutions</a>
+            <a href="<?php echo home_url('reviews-on-website');?>">Reviews & Testimonials</a>
+            <a href="<?php echo home_url('faq-npeh-shig'); ?>">FAQ & Reading</a>
+            <a href="<?php echo home_url('contact');?>">Contact Us</a>
 
         </nav>
 
@@ -288,7 +288,7 @@
             <!-- HOME -->
 
             <a
-                href="index.html"
+                href="<?php echo home_url(); ?>"
                 class="ukt-menu-card active"
             >
 
@@ -324,7 +324,7 @@
             <!-- ABOUT -->
 
             <a
-                href="about-us.html"
+                href="<?php echo home_url('about-us'); ?>"
                 class="ukt-menu-card"
             >
 
@@ -360,7 +360,7 @@
             <!-- E LETTER -->
 
             <a
-                href="e-letters.html"
+                href="<?php echo home_url('e-letters'); ?>"
                 class="ukt-menu-card"
             >
 
@@ -396,7 +396,7 @@
             <!-- INSPIRATIONAL VIDEOS -->
 
             <a
-                href="inspirational-videos.html"
+                href="<?php echo home_url('inspirational-videos'); ?>"
                 class="ukt-menu-card"
             >
 
@@ -432,7 +432,7 @@
             <!-- BOOKS -->
 
             <a
-                href="books-and-articles.html"
+                href="<?php echo home_url('books-and-articles'); ?>"
                 class="ukt-menu-card"
             >
 
@@ -468,7 +468,7 @@
             <!-- UNIVERSAL TALK -->
 
             <a
-                href="universal-talk.html"
+                href="<?php echo home_url('universal-talk'); ?>"
                 class="ukt-menu-card"
             >
 
@@ -526,6 +526,8 @@
                         Activities
                     </span>
 
+                    
+
 
                     <span class="ukt-menu-card-desc">
                         Spirituality, training and service
@@ -563,13 +565,40 @@
 
                         </div>
 
+<?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    
+    if ( isset( $locations['our_events'] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations['our_events'] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
 
-                        <a
+
+                        <!-- <a
                             href="universal-knowledge-trust-our-events.html"
                             class="ukt-submenu-link"
                         >
                             All Our Events
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -586,8 +615,36 @@
 
                         </div>
 
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'spiritualty_and_you';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
 
-                        <a
+
+                        <!-- <a
                             href="karnataka-agnihotra-spectacular.html"
                             class="ukt-submenu-link"
                         >
@@ -608,7 +665,7 @@
                             class="ukt-submenu-link"
                         >
                             Spirituality
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -626,7 +683,35 @@
 
                         </div>
 
-                        <a
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'training_programs';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
+
+                        <!-- <a
                             href="universal-knowledge-trust-training-programs.html"
                             class="ukt-submenu-link"
                         >
@@ -662,7 +747,7 @@
                             class="ukt-submenu-link"
                         >
                             S.T.O.P.
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -680,7 +765,35 @@
 
                         </div>
 
-                        <a
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'we_support';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
+
+                        <!-- <a
                             href="universal-knowledge-trust-we-support.html"
                             class="ukt-submenu-link"
                         >
@@ -708,7 +821,7 @@
                             class="ukt-submenu-link"
                         >
                             Donate to Support
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -726,7 +839,35 @@
 
                         </div>
 
-                        <a
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'project_green';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
+
+                        <!-- <a
                             href="universal-knowledge-trust-project-green.html"
                             class="ukt-submenu-link"
                         >
@@ -754,7 +895,7 @@
                             class="ukt-submenu-link"
                         >
                             Camps
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -799,6 +940,8 @@
 
                 </span>
 
+                
+
 
                 <i
                     class="bi bi-chevron-down ukt-menu-card-arrow"
@@ -827,8 +970,35 @@
                             Healing
 
                         </div>
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'healing';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
 
-                        <a
+                        <!-- <a
                             href="universal-knowledge-trust-category-healing.html"
                             class="ukt-submenu-link"
                         >
@@ -856,7 +1026,7 @@
                             class="ukt-submenu-link"
                         >
                             Online Sessions
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -871,13 +1041,41 @@
 
                         </div>
 
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'parivarthan_app';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
 
-                        <a
+
+                        <!-- <a
                             href="parivarthan-apps.html"
                             class="ukt-submenu-link"
                         >
                             Parivarthan App
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -891,14 +1089,41 @@
                             Healing Locations
 
                         </div>
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'healing_locations';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
 
 
-                        <a
+                        <!-- <a
                             href="healing-locations.html"
                             class="ukt-submenu-link"
                         >
                             Healing Locations
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -913,13 +1138,41 @@
 
                         </div>
 
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'spiritual_resources';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
 
-                        <a
+
+                        <!-- <a
                             href="mantra-downloads.html"
                             class="ukt-submenu-link"
                         >
                             Mantra Downloads
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -993,14 +1246,41 @@
                             Press
 
                         </div>
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'press';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
 
 
-                        <a
+                        <!-- <a
                             href="press-release.html"
                             class="ukt-submenu-link"
                         >
                             Press Release
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -1014,9 +1294,36 @@
                             Reviews
 
                         </div>
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'reviews';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
 
 
-                        <a
+                        <!-- <a
                             href="reviews-on-website.html"
                             class="ukt-submenu-link"
                         >
@@ -1029,7 +1336,7 @@
                             class="ukt-submenu-link"
                         >
                             Reviews on Google Maps
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -1043,9 +1350,36 @@
                             Testimonials
 
                         </div>
+                        <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'testimonials';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
+            }
+        }
+    }
+?>
 
 
-                        <a
+                        <!-- <a
                             href="program-testimonials.html"
                             class="ukt-submenu-link"
                         >
@@ -1058,7 +1392,7 @@
                             class="ukt-submenu-link"
                         >
                             Video Testimonials
-                        </a>
+                        </a> -->
 
                     </div>
 
@@ -1121,8 +1455,46 @@
             <div class="ukt-submenu-inner">
                 <div class="ukt-submenu-grid">
 
+                <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'faq-and-reading';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            // $count = 0;
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                // if($count == 0){
+                //     echo '<div>';
+                // }
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
 
-                    <div>
+                // if($count == 2){
+                //     echo '</div>';
+                //     $count = -1;
+                // }
+                // $count++;
+
+            }
+        }
+    }
+?>
+                    <!-- <div>
+                        
 
                         <a
                             href="faq-npeh-shig.html"
@@ -1140,6 +1512,7 @@
                         </a>
 
                     </div>
+                    
 
 
                     <div>
@@ -1159,7 +1532,7 @@
                             Internet Safety
                         </a>
 
-                    </div>
+                    </div> -->
 
 
                 </div>
@@ -1310,6 +1683,8 @@
 
 
         </div>
+
+        
 
 
 
@@ -2168,7 +2543,57 @@ if (noResultsElem) {
     });
 });
 
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Get the current URL without trailing slash
+    let currentUrl = window.location.href.replace(/\/$/, "");
+
+    // 2. Handle all Top-Level Direct Links (Home, About Us, E-Letter, etc.)
+    const topLevelLinks = document.querySelectorAll('.ukt-menu-grid > a.ukt-menu-card');
+    topLevelLinks.forEach(function(link) {
+        if (link.href.replace(/\/$/, "") === currentUrl) {
+            link.classList.add('active');
+        }
+    });
+
+    // 3. Handle all Submenus (Activities, Healing, Reviews, FAQ, Contact)
+    const expandButtons = document.querySelectorAll('.ukt-expand-button');
+
+    expandButtons.forEach(function(button) {
+        // Find out which submenu this button controls (e.g., #uktHealing)
+        const targetId = button.getAttribute('data-bs-target');
+        const targetPanel = document.querySelector(targetId);
+
+        if (!targetPanel) return;
+
+        // Look at all links inside this specific submenu
+        const submenuLinks = targetPanel.querySelectorAll('a');
+        let isSubmenuActive = false;
+
+        submenuLinks.forEach(function(link) {
+            if (link.href.replace(/\/$/, "") === currentUrl) {
+                isSubmenuActive = true;
+            }
+        });
+
+        // If a match is found inside this submenu...
+        if (isSubmenuActive) {
+            // 1. Add active class to the parent button
+            button.classList.add('active');
+            
+            // 2. Automatically open the submenu
+            if (typeof bootstrap !== 'undefined') {
+                new bootstrap.Collapse(targetPanel, { toggle: true });
+            }
+        }
+    });
+});
+
 </script>
+
+
+
 
 
 <?php wp_footer();?>
