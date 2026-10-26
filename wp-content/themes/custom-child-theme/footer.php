@@ -43,17 +43,86 @@
         ============================================== -->
         <nav class="ukt-luxury-footer-nav">
 
-            <a href="<?php echo home_url(); ?>" class="ukt-footer-active">Home</a>
+            <a href="<?php echo home_url(); ?>" class="">Home</a>
             <a href="<?php echo home_url('/about-us');?>">About Us</a>
             <a href="<?php echo home_url('e-letter');?>">E-Letter</a>
             <a href="<?php echo home_url('/inspirational-videos');?>"> Inspirational Videos</a>
             <a href="<?php echo home_url('books-and-articles');?>">Books & Articles</a>
             <a href="<?php echo home_url('universal-talk');?>">Universal Talk</a>
-            <a href="<?php echo home_url('karnataka-agnihotra-spectacular');?>">Activities</a>
+            <?php
+
+            $dynamic_menus = array(
+    'our_events'      => 'Activities',
+    'healing'         => 'Healing Solutions',
+    'press'           => 'Reviews & Testimonials',
+    'faq-and-reading' =>   'FAQ & Reading',
+    'contact-us'      => 'Contact Us'
+    // 'another_menu_location' => 'Another Label', // Add more here as needed
+);
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+
+    if(!empty($dynamic_menus)) {
+        foreach($dynamic_menus as $menu_slug => $link_text){
+            if ( isset( $locations[$menu_slug] ) ) {
+                $menu_items = wp_get_nav_menu_items( $locations[$menu_slug] );
+                // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            $counter = true;
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                $active_class = '';
+                // foreach($menu_items as $item){
+
+                //     if ( $item->object_id == $current_page_id ) {
+                //         $active_class = ' ukt-footer-active';
+                //         }
+                //     }
+                
+                if($counter){
+                    // 5. Output the link with the dynamic class
+                    echo '<a href="' . esc_url( $item->url ) . '" class="' . $active_class . '"> '.$link_text.' </a>';
+                }
+                $counter = false;
+                    
+            }
+        }
+            }
+        }
+    }
+    
+    // if ( isset( $locations['our_events'] ) ) {
+    //     $menu_items = wp_get_nav_menu_items( $locations['our_events'] );
+        
+    //     // 2. Get the ID of the current page being viewed
+    //     $current_page_id = get_queried_object_id();
+        
+    //     // 3. Loop through the items
+    //     if ( ! empty( $menu_items ) ) {
+    //         foreach ( $menu_items as $item ) {
+                
+    //             // 4. Check if the menu item's object ID matches the current page ID
+    //             $active_class = '';
+    //             if ( $item->object_id == $current_page_id ) {
+    //                 $active_class = ' ukt-footer-active';
+    //             }
+                
+    //             // 5. Output the link with the dynamic class
+    //             echo '<a href="' . esc_url( $item->url ) . '" class="' . $active_class . '"> Activities </a>';
+    //             break;
+    //         }
+    //     }
+    // }
+?>
+            <!-- <a href="<?php echo home_url('karnataka-agnihotra-spectacular');?>">Activities</a>
             <a href="<?php echo home_url('self-healing');?>">Healing Solutions</a>
             <a href="<?php echo home_url('reviews-on-website');?>">Reviews & Testimonials</a>
             <a href="<?php echo home_url('faq-npeh-shig'); ?>">FAQ & Reading</a>
-            <a href="<?php echo home_url('contact');?>">Contact Us</a>
+            <a href="<?php echo home_url('contact');?>">Contact Us</a> -->
 
         </nav>
 
@@ -289,7 +358,7 @@
 
             <a
                 href="<?php echo home_url(); ?>"
-                class="ukt-menu-card active"
+                class="ukt-menu-card <?php echo is_front_page() ? 'active' : ''?>"
             >
 
                 <span class="ukt-menu-card-icon">
@@ -325,7 +394,7 @@
 
             <a
                 href="<?php echo home_url('about-us'); ?>"
-                class="ukt-menu-card"
+                class="ukt-menu-card <?php echo is_page('about-us') ? 'active' : ''; ?>"
             >
 
                 <span class="ukt-menu-card-icon">
@@ -360,8 +429,8 @@
             <!-- E LETTER -->
 
             <a
-                href="<?php echo home_url('e-letters'); ?>"
-                class="ukt-menu-card"
+                href="<?php echo home_url('e-letter'); ?>"
+                class="ukt-menu-card <?php echo is_page('e-letter') ? 'active' : ''; ?>"
             >
 
                 <span class="ukt-menu-card-icon">
@@ -397,7 +466,7 @@
 
             <a
                 href="<?php echo home_url('inspirational-videos'); ?>"
-                class="ukt-menu-card"
+                class="ukt-menu-card <?php echo is_page('inspirational-videos') ? 'active' : ''; ?>"
             >
 
                 <span class="ukt-menu-card-icon">
@@ -433,7 +502,7 @@
 
             <a
                 href="<?php echo home_url('books-and-articles'); ?>"
-                class="ukt-menu-card"
+                class="ukt-menu-card <?php echo is_page('books-and-articles') ? 'active' : ''; ?>"
             >
 
                 <span class="ukt-menu-card-icon">
@@ -469,7 +538,7 @@
 
             <a
                 href="<?php echo home_url('universal-talk'); ?>"
-                class="ukt-menu-card"
+                class="ukt-menu-card <?php echo is_page('universal-talk') ? 'active' : ''; ?>"
             >
 
                 <span class="ukt-menu-card-icon">
@@ -646,8 +715,7 @@
 
                         <!-- <a
                             href="karnataka-agnihotra-spectacular.html"
-                            class="ukt-submenu-link"
-                        >
+                            class="ukt-submenu-link">
                             Karnataka Agnihotra Spectacular
                         </a>
 
@@ -1468,13 +1536,13 @@
         
         // 3. Loop through the items
         if ( ! empty( $menu_items ) ) {
-            // $count = 0;
+            $count = 0;
             foreach ( $menu_items as $item ) {
                 
                 // 4. Check if the menu item's object ID matches the current page ID
-                // if($count == 0){
-                //     echo '<div>';
-                // }
+                if($count == 0){
+                    echo '<div>';
+                }
                 $active_class = '';
                 if ( $item->object_id == $current_page_id ) {
                     $active_class = ' active';
@@ -1483,12 +1551,15 @@
                 // 5. Output the link with the dynamic class
                 echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
 
-                // if($count == 2){
-                //     echo '</div>';
-                //     $count = -1;
-                // }
-                // $count++;
+                $count++;
+                if($count == 2){
+                    echo '</div>';
+                    $count = 0;
+                }
 
+            }
+            if($count == 1){
+                echo '</div>';
             }
         }
     }
@@ -1593,8 +1664,50 @@
                 <div class="ukt-submenu-inner">
                 <div class="ukt-submenu-grid">
 
+                <?php
+    // 1. Get the menu assigned to 'our_events'
+    $locations = get_nav_menu_locations();
+    $item = 'contact-us';
+    
+    if ( isset( $locations[$item] ) ) {
+        $menu_items = wp_get_nav_menu_items( $locations[$item] );
+        
+        // 2. Get the ID of the current page being viewed
+        $current_page_id = get_queried_object_id();
+        
+        // 3. Loop through the items
+        if ( ! empty( $menu_items ) ) {
+            $count = 0;
+            foreach ( $menu_items as $item ) {
+                
+                // 4. Check if the menu item's object ID matches the current page ID
+                if($count == 0){
+                    echo '<div>';
+                }
+                $active_class = '';
+                if ( $item->object_id == $current_page_id ) {
+                    $active_class = ' active';
+                }
+                
+                // 5. Output the link with the dynamic class
+                echo '<a href="' . esc_url( $item->url ) . '" class="ukt-submenu-link' . $active_class . '">' . esc_html( $item->title ) . '</a>';
 
-                    <div>
+                $count++;
+                if($count == 2){
+                    echo '</div>';
+                    $count = 0;
+                }
+
+            }
+            if($count == 1){
+                echo '</div>';
+            }
+        }
+    }
+?>
+
+
+                    <!-- <div>
 
                         <a
                             href="contact.html"
@@ -1631,7 +1744,7 @@
                             Donations
                         </a>
 
-                    </div>
+                    </div> -->
 
 
                 </div>
@@ -1671,7 +1784,7 @@
 
 
             <a
-                href="donations.html"
+                href="<?php echo home_url('donations'); ?>"
                 class="ukt-support-button"
             >
 
@@ -1713,7 +1826,7 @@
             </a>
 
 
-            <a href="inspirational-videos.html">
+            <a href="<?php echo home_url('inspirational-videos'); ?>">
 
                 <i class="bi bi-play-circle"></i>
 
@@ -1722,7 +1835,7 @@
             </a>
 
 
-            <a href="books-and-articles.html">
+            <a href="<?php echo home_url('books-and-articles'); ?>">
 
                 <i class="bi bi-book"></i>
 

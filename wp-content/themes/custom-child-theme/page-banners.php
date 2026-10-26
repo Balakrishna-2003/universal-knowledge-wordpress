@@ -1289,6 +1289,73 @@ switch ($page_slug) {
     </section>
         <?php
         break;
+    case 'contact-us':
+        ?>
+        <!-- =========================================================
+         CONTACT US BANNER / HERO SECTION
+         (Matches index.html showcase hero layout)
+    ========================================================== -->
+        <section class="ukt-hero-showcase">
+            <div class="ukt-hero-slide-layout">
+                <div class="container-fluid">
+                    <div class="row g-0 align-items-stretch">
+
+                        <!-- LEFT CONTENT AREA -->
+                        <div class="col-lg-5 d-flex align-items-center">
+                            <div class="ukt-hero-copy-zone ukt-contact-hero-copy-zone">
+                                <div class="ukt-hero-left-decoration"></div>
+
+                                <div class="ukt-hero-slide-kicker">
+                                    <i class="bi bi-chat-heart me-1 ukt-text-green"></i>
+                                    Universal Knowledge Trust • Get In Touch
+                                </div>
+
+                                <h1 class="ukt-hero-main-title">
+                                    <span>Connect</span>
+                                    <span>With Us</span>
+                                </h1>
+
+                                <div class="ukt-hero-script-line">
+                                    Guidance, Healing &amp; Wellbeing.
+                                </div>
+
+                                <p class="ukt-hero-description ukt-contact-hero-description">
+                                    Reach out for spiritual guidance, energy healing appointments, and program inquiries. We are here to support your journey.
+                                </p>
+
+                                <div class="ukt-hero-action-row mt-3">
+                                    <a href="tel:+919632171156" class="ukt-hero-primary-action ukt-btn-cta-gold">
+                                        <i class="bi bi-telephone-fill me-1"></i> Call Us
+                                    </a>
+
+                                    <a href="https://wa.me/919845082856" target="_blank" rel="noopener noreferrer" class="ukt-hero-secondary-action">
+                                        <i class="bi bi-whatsapp text-success me-1"></i> WhatsApp
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- RIGHT IMAGE AREA -->
+                        <div class="col-lg-7">
+                            <div class="ukt-hero-visual-zone">
+                                <div class="ukt-hero-image-frame">
+                                    <figure class="ukt-hero-image-figure">
+                                        <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/contact-us-banner.jpg"
+                                            alt="Contact Universal Knowledge Trust - Inner Harmony and Guidance"
+                                            loading="eager" class="ukt-hero-image-cover">
+                                        <figcaption class="visually-hidden">Contact Universal Knowledge Trust Hero Banner</figcaption>
+                                    </figure>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <?php 
+        break;
     
     default:
         # code...
