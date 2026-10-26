@@ -25016,3 +25016,55 @@ body.ukt-print-body {
 .owl-item>.item {
     width: 100%;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Arrange multiple images inside WordPress post content in a row */
+.single-post .entry-content p:has(> img) {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+/* Remove WordPress alignment spacing */
+.single-post .entry-content p:has(> img) > img {
+    display: block !important;
+    float: none !important;
+    margin: 0 !important;
+    width: calc(33.333% - 8px) !important;
+    max-width: calc(33.333% - 8px) !important;
+    height: auto !important;
+    object-fit: contain;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+    .single-post .entry-content p:has(> img) > img {
+        width: calc(50% - 6px) !important;
+        max-width: calc(50% - 6px) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .single-post .entry-content p:has(> img) > img {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
