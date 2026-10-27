@@ -1,0 +1,30 @@
+@use "../../variables" as *;
+
+.modula-gallery-takeover__preview-actions {
+	flex-shrink: 0;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: $mod-space-12;
+	min-height: $mod-space-40;
+	padding: 0 $mod-space-16;
+	background: var(--mod-se-chrome, var(--mod-se-preview-toolbar-bg, #{$mod-takeover-preview-toolbar-bg}));
+	border-top: 1px solid var(--mod-se-line, var(--mod-se-preview-toolbar-border, #{$mod-takeover-preview-toolbar-border}));
+	color: var(--mod-se-ink-2, var(--mod-se-preview-ink-secondary, #{$mod-takeover-text-base}));
+	font-size: 12px;
+
+	.modula-settings-editor__save-bar {
+		flex-direction: row;
+		align-items: center;
+		gap: $mod-space-10;
+		padding: 0;
+		margin: 0;
+		border: none;
+		color: inherit;
+
+		p,
+		.components-notice__content {
+			color: var(--mod-se-preview-ink-muted, #{$mod-takeover-text-muted});
+		}
+	}
+}

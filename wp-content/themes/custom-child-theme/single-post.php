@@ -148,8 +148,8 @@
                                         }
                                         ?>
 
-                                        <!-- RELATED POST CARD -->
-                                        <div class="card border-0 rounded-4 overflow-hidden shadow-sm mb-3 position-relative text-white ukt-related-post-card">
+                                        <!-- RELATED POST CARD (NOW AN <a> TAG) -->
+                                        <a href="<?php echo esc_url( $rel_link ); ?>" class="card border-0 rounded-4 overflow-hidden shadow-sm mb-3 position-relative text-white ukt-related-post-card text-decoration-none d-block">
                                             <figure class="ukt-related-post-figure">
                                                 <img src="<?php echo esc_url( $rel_thumb ); ?>" alt="<?php echo esc_attr( $rel_title ); ?>" title="<?php echo esc_attr( $rel_title ); ?>" loading="lazy" class="ukt-related-post-img">
                                                 <div class="ukt-related-post-overlay"></div>
@@ -170,16 +170,15 @@
                                                 <!-- BOTTOM: TITLE AND DATE -->
                                                 <div class="mt-auto pt-3">
                                                     <h5 class="lh-sm mb-2 ukt-related-post-title">
-                                                        <a href="<?php echo esc_url( $rel_link ); ?>" class="text-white text-decoration-none">
-                                                            <?php echo esc_html( $rel_title ); ?>
-                                                        </a>
+                                                        <?php echo esc_html( $rel_title ); ?>
                                                     </h5>
                                                     <div class="small text-white-50 ukt-related-post-date">
                                                         <i class="bi bi-calendar3 me-1 text-warning"></i> <?php echo esc_html( $rel_date ); ?>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </a>
+                                    
 
                                         <?php
                                     } // End While Loop

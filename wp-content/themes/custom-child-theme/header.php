@@ -74,7 +74,7 @@
                 <!-- LOGO -->
 
                 <a
-                    href="index.html"
+                    href="<?php echo home_url(); ?>"
                     class="ukt-logo"
                 >
 
@@ -217,7 +217,7 @@
 
 
                 <a
-                    href="index.html"
+                    href="<?php echo home_url(); ?>"
                     class="ukt-mobile-brand"
                 >
 

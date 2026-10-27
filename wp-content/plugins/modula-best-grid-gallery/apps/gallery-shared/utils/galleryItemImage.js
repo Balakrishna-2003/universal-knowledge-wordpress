@@ -1,0 +1,780 @@
+/**
+ * Gallery item image: sizes, picture sources, and img attributes.
+ * Uses WordPress srcset/sizes (from item processor) for responsive images; legacy vs cover style for layout.
+ */
+
+import {
+	mergeReactClassNameProps,
+	normalizeReactDomProps,
+	spreadAttrs,
+} from './attributeUtils';
+import { getMimeTypeFromUrl } from './imageMime';
+import { getPictureSources } from './pictureSources';
+import { computeLegacyImageStyle } from './legacyImagePlacement';
+import { isLazyLoadEnabled } from './lazyLoad';
+import {
+	itemUsesCustomGridLetterbox,
+	MODULA_IMG_LETTERBOX_CONTAIN_CLASS,
+} from './customGridTileImageFit';
+
+function isDefined(value) {
+	return value !== null && value !== undefined;
+}
+
+function isValidPositiveNumber(value) {
+	const n = Number(value);
+	return isDefined(value) && !Number.isNaN(n) && n > 0;
+}
+
+/**
+ * Normalized focal point 0–1 from item row or img data attributes.
+ *
+ * @param {Object} itemData - Raw item from store / bootstrap.
+ * @return {{ x: number, y: number }|null} Focal point or null when unset.
+ */
+export function parseItemFocalPoint(itemData) {
+	if (!itemData) {
+		return null;
+	}
+	const imgAttrs = itemData.imgAttributes || itemData.img_attributes || {};
+	const x = parseFloat(itemData.focal_x ?? imgAttrs['data-focal-x']);
+	const y = parseFloat(itemData.focal_y ?? imgAttrs['data-focal-y']);
+	if (Number.isFinite(x) && Number.isFinite(y)) {
+		return {
+			x: Math.min(1, Math.max(0, x)),
+			y: Math.min(1, Math.max(0, y)),
+		};
+	}
+	return null;
+}
+
+/**
+ * Normalized crop rectangle on source media (0–1), from item row or data attributes.
+ * When set, the tile maps that rect onto the slot with uniform scale (no object-fit: cover).
+ *
+ * @param {Object} itemData
+ * @return {{ x: number, y: number, width: number, height: number }|null}
+ */
+export function parseItemFocalCrop(itemData) {
+	if (!itemData) {
+		return null;
+	}
+	const imgAttrs = itemData.imgAttributes || itemData.img_attributes || {};
+	const read = (snake) =>
+		parseFloat(
+			itemData[snake] ?? imgAttrs[`data-${snake.replace(/_/g, '-')}`]
+		);
+	const x = read('focal_crop_x');
+	const y = read('focal_crop_y');
+	const w = read('focal_crop_w');
+	const h = read('focal_crop_h');
+	if (
+		Number.isFinite(x) &&
+		Number.isFinite(y) &&
+		Number.isFinite(w) &&
+		Number.isFinite(h) &&
+		w > 0 &&
+		h > 0
+	) {
+		return {
+			x: Math.min(1, Math.max(0, x)),
+			y: Math.min(1, Math.max(0, y)),
+			width: Math.min(1, Math.max(1e-6, w)),
+			height: Math.min(1, Math.max(1e-6, h)),
+		};
+	}
+	return null;
+}
+
+/** Img class: paired with SCSS so --modula-focal-* beats third-party !important on `.modula img`. */
+export const MODULA_IMG_FOCAL_CROP_CLASS = 'modula-item-img--focal-crop';
+
+/** Object-position focal only (no crop rect): disables `.modula img` width/transform transition. */
+export const MODULA_IMG_FOCAL_POINT_CLASS = 'modula-item-img--focal-point';
+
+/**
+ * Format responsive sizes from three vw terms + config breakpoints.
+ *
+ * @param {Object} config    Flat gallery config.
+ * @param {string} mobileVw  Mobile term.
+ * @param {string} tabletVw  Tablet term.
+ * @param {string} desktopVw Desktop term.
+ * @return {string}
+ */
+function formatResponsiveImageSizes(config, mobileVw, tabletVw, desktopVw) {
+	const phoneUnder = (() => {
+		const n = parseInt(config?.treatAsPhoneUnder ?? 600, 10);
+		return Number.isFinite(n) && n > 0 ? n : 600;
+	})();
+	let tabletUnder = (() => {
+		const n = parseInt(config?.treatAsTabletUnder ?? 1024, 10);
+		return Number.isFinite(n) && n > 0 ? n : 1024;
+	})();
+	if (tabletUnder <= phoneUnder) {
+		tabletUnder = phoneUnder + 1;
+	}
+
+	return `(max-width: ${phoneUnder}px) ${mobileVw}, (max-width: ${tabletUnder}px) ${tabletVw}, ${desktopVw}`;
+}
+
+/**
+ * @param {number} cols Column count.
+ * @return {string}
+ */
+function columnsToVwTerm(cols) {
+	return `${Math.round((100 / Math.max(1, cols)) * 100) / 100}vw`;
+}
+
+/**
+ * Custom-grid data-width is on a fixed 12-unit base.
+ *
+ * @param {number} span           Span width 1–12.
+ * @param {number} [coverScale=1] Rendered image width / tile width (>= 1).
+ * @return {string} vw term, at most `100vw`.
+ */
+function customGridSpanToVwTerm(span, coverScale = 1) {
+	const clamped = Math.max(1, Math.min(12, Math.floor(span) || 1));
+	const width = Math.min(12, clamped * Math.max(1, coverScale));
+	return `${Math.round(((100 * width) / 12) * 100) / 100}vw`;
+}
+
+/**
+ * @typedef {Object} CustomGridCover
+ * @property {number|string|null|undefined} spanHeight      Span height in grid cells.
+ * @property {number|string|null|undefined} intrinsicWidth  Displayed source width.
+ * @property {number|string|null|undefined} intrinsicHeight Displayed source height.
+ */
+
+/**
+ * How much wider than its tile a custom-grid image renders (PHP twin:
+ * modula_get_custom_grid_cover_scale).
+ *
+ * Images cover their tile: a photo wider than the tile's aspect is scaled to
+ * the tile height and cropped at the sides. Grid cells are about square, so
+ * the tile aspect follows from the spans.
+ *
+ * @param {number}                         spanWidth Span width in grid cells.
+ * @param {CustomGridCover|null|undefined} cover     Covered tile inputs; absent when
+ *                                                   the image is letterboxed.
+ * @return {number} Scale >= 1; 1 when spans or source size are unknown.
+ */
+function getCustomGridCoverScale(spanWidth, cover) {
+	if (!cover) {
+		return 1;
+	}
+	const height = parseInt(cover.spanHeight, 10);
+	const imageWidth = Number(cover.intrinsicWidth);
+	const imageHeight = Number(cover.intrinsicHeight);
+	if (!(height > 0) || !(imageWidth > 0) || !(imageHeight > 0)) {
+		return 1;
+	}
+	const tileHeightPerWidth = height / spanWidth;
+	return Math.max(1, tileHeightPerWidth * (imageWidth / imageHeight));
+}
+
+/**
+ * @param {unknown} value Raw span.
+ * @return {number|undefined}
+ */
+export function parseCustomGridSpanWidth(value) {
+	const n = parseInt(value, 10);
+	if (!Number.isFinite(n) || n < 1) {
+		return undefined;
+	}
+	return Math.min(12, n);
+}
+
+/**
+ * Estimate sizes for a custom-grid tile from its 12-unit span.
+ *
+ * @param {Object} config         Flat gallery config.
+ * @param {number} span           Span width 1–12.
+ * @param {number} [coverScale=1] Rendered image width / tile width (>= 1).
+ * @return {string} Responsive sizes string.
+ */
+export function estimateCustomGridSpanSizes(config, span, coverScale = 1) {
+	const spanVw = customGridSpanToVwTerm(span, coverScale);
+	const enableResponsive = Boolean(config?.enableResponsive);
+	const mobileCols = enableResponsive
+		? parseInt(config?.mobileColumns ?? 1, 10)
+		: 0;
+	const mobileVw =
+		enableResponsive && Number.isFinite(mobileCols) && mobileCols === 1
+			? '100vw'
+			: spanVw;
+	return formatResponsiveImageSizes(config || {}, mobileVw, spanVw, spanVw);
+}
+
+/**
+ * Estimate a sizes attribute from gallery column breakpoints (eager images).
+ * Lazy images should prefer `auto` instead.
+ *
+ * @param {Object|null|undefined}          config            Flat gallery config.
+ * @param {number|null|undefined}          [spanWidth]       Custom-grid 12-unit span when known.
+ * @param {CustomGridCover|null|undefined} [customGridCover] Inputs for a tile the image covers.
+ * @return {string|undefined} Column-based sizes string when estimable.
+ */
+export function estimateGalleryImageSizes(config, spanWidth, customGridCover) {
+	if (!config || typeof config !== 'object') {
+		return undefined;
+	}
+
+	const type = typeof config.type === 'string' ? config.type : '';
+	if (['slider', 'showcase', 'story', 'video'].includes(type)) {
+		return '100vw';
+	}
+	if (type === 'template') {
+		return '(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw';
+	}
+
+	const parsedSpan = parseCustomGridSpanWidth(spanWidth);
+	if (type === 'custom-grid' && parsedSpan) {
+		return estimateCustomGridSpanSizes(
+			config,
+			parsedSpan,
+			getCustomGridCoverScale(parsedSpan, customGridCover)
+		);
+	}
+
+	/*
+	 * Custom-grid packing columns ≠ visual column count. Without a span,
+	 * prefer a conservative half-width estimate over 100/columns.
+	 */
+	if (type === 'custom-grid') {
+		const enableResponsive = Boolean(config.enableResponsive);
+		const mobileCols = enableResponsive
+			? parseInt(config.mobileColumns ?? 1, 10)
+			: 0;
+		const mobileVw =
+			enableResponsive && Number.isFinite(mobileCols) && mobileCols === 1
+				? '100vw'
+				: '50vw';
+		return formatResponsiveImageSizes(config, mobileVw, '50vw', '50vw');
+	}
+
+	const clampCols = (value, fallback) => {
+		const n = parseInt(value, 10);
+		if (!Number.isFinite(n) || n < 1) {
+			return fallback;
+		}
+		return Math.min(12, n);
+	};
+
+	const conservativeAutomatic =
+		'(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 33vw';
+	const gridTypeLayouts = [
+		'grid',
+		'uniform-grid',
+		'fit-grid',
+		'parallax-masonry',
+	];
+	const usesGridType = gridTypeLayouts.includes(type);
+
+	let colsDesktop;
+	if (usesGridType) {
+		const gridType = config.gridType ?? config.grid_type;
+		const parsed = parseInt(gridType, 10);
+		if (Number.isFinite(parsed) && String(gridType) !== 'automatic') {
+			colsDesktop = clampCols(parsed, 4);
+		} else if (type === 'grid') {
+			return conservativeAutomatic;
+		} else {
+			colsDesktop = clampCols(config.columns ?? 4, 4);
+		}
+	} else {
+		colsDesktop = clampCols(config.columns ?? 4, 4);
+	}
+
+	const enableResponsive = Boolean(config.enableResponsive);
+	const colsTablet = enableResponsive
+		? clampCols(config.tabletColumns ?? 2, colsDesktop)
+		: colsDesktop;
+	const colsMobile = enableResponsive
+		? clampCols(config.mobileColumns ?? 1, colsDesktop)
+		: colsDesktop;
+
+	return formatResponsiveImageSizes(
+		config,
+		columnsToVwTerm(colsMobile),
+		columnsToVwTerm(colsTablet),
+		columnsToVwTerm(colsDesktop)
+	);
+}
+
+/**
+ * Compute effective sizes attribute for <img>/<source>.
+ *
+ * Priority: measured rendered image width → sizes="auto" when lazy →
+ * custom-grid span estimate → column estimate → server sizes. Never use
+ * attachment/file pixel width (that made browsers pick 2×–4× oversized srcset
+ * candidates in multi-column grids).
+ *
+ * @param {Object}                         params
+ * @param {number|null|undefined}          params.renderedWidth     Measured image width (getRenderedImageWidth), not the tile width
+ * @param {string}                         [params.imageSizes]      Server-provided sizes string
+ * @param {unknown}                        [params.lazyLoad]
+ * @param {Object|null|undefined}          [params.config]
+ * @param {number|null|undefined}          [params.spanWidth]       Custom-grid 12-unit span
+ * @param {CustomGridCover|null|undefined} [params.customGridCover] Inputs for a tile the image covers (estimate path only)
+ * @return {string|undefined} Effective `sizes` string when derivable.
+ */
+export function getEffectiveSizes({
+	renderedWidth,
+	imageSizes,
+	lazyLoad,
+	config,
+	spanWidth,
+	customGridCover,
+}) {
+	if (isValidPositiveNumber(renderedWidth)) {
+		return `${Math.round(Number(renderedWidth))}px`;
+	}
+	if (isLazyLoadEnabled(lazyLoad)) {
+		return 'auto';
+	}
+	const estimated = estimateGalleryImageSizes(
+		config,
+		spanWidth,
+		customGridCover
+	);
+	if (estimated) {
+		return estimated;
+	}
+	return imageSizes || undefined;
+}
+
+/**
+ * Whether to use legacy image placement (tile + image dimensions available).
+ *
+ * @param {Object}                       params
+ * @param {number|null|undefined}        params.slotWidth
+ * @param {number|null|undefined}        params.slotHeight
+ * @param {number|string|null|undefined} params.intrinsicWidth
+ * @param {number|string|null|undefined} params.intrinsicHeight
+ * @return {boolean} True when tile + image dimensions allow legacy placement.
+ */
+export function useLegacyPlacement({
+	slotWidth,
+	slotHeight,
+	intrinsicWidth,
+	intrinsicHeight,
+}) {
+	return (
+		isValidPositiveNumber(slotWidth) &&
+		isValidPositiveNumber(slotHeight) &&
+		Number(intrinsicWidth) > 0 &&
+		Number(intrinsicHeight) > 0
+	);
+}
+
+/**
+ * Picture sources from item data. Uses WordPress srcset (from item processor via wp_calculate_image_srcset)
+ * when present; otherwise a single source from item src. The browser picks the right candidate using
+ * the sizes attribute (e.g. slot width from getEffectiveSizes).
+ *
+ * @param {Object} params
+ * @param {Object} params.itemData - Item with src, srcset, pictureSources from server
+ * @return {{ type: string, srcset: string }[]} Picture `<source>` candidates.
+ */
+export function getPictureSourcesForItem({ itemData }) {
+	return getPictureSources(itemData, getMimeTypeFromUrl);
+}
+
+/**
+ * Uniform scale so a focal crop region covers the tile (same math as
+ * zoom-to-crop, no stretching).
+ *
+ * @param {Object}                                                  params
+ * @param {{ x: number, y: number, width: number, height: number }} params.focalCrop
+ * @param {number|null|undefined}                                   params.slotWidth
+ * @param {number|null|undefined}                                   params.slotHeight
+ * @param {number|string|null|undefined}                            params.intrinsicWidth
+ * @param {number|string|null|undefined}                            params.intrinsicHeight
+ * @return {number|null} Scale from source pixels to tile pixels, or null when
+ *                       the tile or source size is unknown.
+ */
+function getFocalCropScale({
+	focalCrop,
+	slotWidth,
+	slotHeight,
+	intrinsicWidth,
+	intrinsicHeight,
+}) {
+	if (
+		!isValidPositiveNumber(slotWidth) ||
+		!isValidPositiveNumber(slotHeight) ||
+		!isValidPositiveNumber(intrinsicWidth) ||
+		!isValidPositiveNumber(intrinsicHeight)
+	) {
+		return null;
+	}
+	const cropSourceWidth = focalCrop.width * Number(intrinsicWidth);
+	const cropSourceHeight = focalCrop.height * Number(intrinsicHeight);
+	const scale = Math.max(
+		Number(slotWidth) / cropSourceWidth,
+		Number(slotHeight) / cropSourceHeight
+	);
+	return Number.isFinite(scale) ? scale : null;
+}
+
+/**
+ * Width of a covered image box: scaled to fill the tile on one axis and
+ * overflowing on the other (object-fit cover and legacy placement alike).
+ *
+ * @param {Object}                       params
+ * @param {number}                       params.slotWidth
+ * @param {number|null|undefined}        params.slotHeight
+ * @param {number|string|null|undefined} params.intrinsicWidth
+ * @param {number|string|null|undefined} params.intrinsicHeight
+ * @return {number} Rendered width; the slot width when the height or the
+ *                  source size is unknown.
+ */
+function getCoverImageWidth({
+	slotWidth,
+	slotHeight,
+	intrinsicWidth,
+	intrinsicHeight,
+}) {
+	if (
+		!isValidPositiveNumber(slotHeight) ||
+		!isValidPositiveNumber(intrinsicWidth) ||
+		!isValidPositiveNumber(intrinsicHeight)
+	) {
+		return slotWidth;
+	}
+	const sourceAspect = Number(intrinsicWidth) / Number(intrinsicHeight);
+	return Math.max(slotWidth, Number(slotHeight) * sourceAspect);
+}
+
+/** How an `<img>` is placed in its tile; one decision for style and `sizes`. */
+const IMAGE_PLACEMENT = {
+	FOCAL_CROP: 'focal-crop',
+	FOCAL_POINT: 'focal-point',
+	NATURAL_FLOW: 'natural-flow',
+	FILL: 'fill',
+	LEGACY: 'legacy',
+};
+
+/**
+ * @param {Object}  params
+ * @param {boolean} params.useLegacy
+ * @param {Object}  [params.focalPoint]
+ * @param {Object}  [params.focalCrop]
+ * @param {boolean} [params.captionBelowNaturalFlow]
+ * @return {string} One of IMAGE_PLACEMENT, in getImgStyleForItem precedence.
+ */
+function getImagePlacement({
+	useLegacy,
+	focalPoint,
+	focalCrop,
+	captionBelowNaturalFlow,
+}) {
+	if (focalCrop) {
+		return IMAGE_PLACEMENT.FOCAL_CROP;
+	}
+	if (focalPoint) {
+		return IMAGE_PLACEMENT.FOCAL_POINT;
+	}
+	if (captionBelowNaturalFlow) {
+		return IMAGE_PLACEMENT.NATURAL_FLOW;
+	}
+	return useLegacy ? IMAGE_PLACEMENT.LEGACY : IMAGE_PLACEMENT.FILL;
+}
+
+/**
+ * Width of the `<img>` bitmap once placed in a measured tile, for the `sizes`
+ * attribute. A covered or zoomed image renders wider than its tile, so
+ * declaring the tile width alone makes the browser pick a candidate it then
+ * upscales. Takes the same placement inputs as getImgStyleForItem.
+ *
+ * @param {Object}                                                       params
+ * @param {boolean}                                                      params.useLegacy
+ * @param {number|null|undefined}                                        params.slotWidth                 Measured tile width.
+ * @param {number|null|undefined}                                        params.slotHeight
+ * @param {number|string|null|undefined}                                 params.intrinsicWidth
+ * @param {number|string|null|undefined}                                 params.intrinsicHeight
+ * @param {{ x: number, y: number }|null}                                [params.focalPoint]
+ * @param {{ x: number, y: number, width: number, height: number }|null} [params.focalCrop]
+ * @param {boolean}                                                      [params.captionBelowNaturalFlow]
+ * @param {'cover'|'contain'}                                            [params.objectFit]
+ * @return {number|undefined} Rendered image width in CSS pixels; undefined
+ *                            until the tile is measured.
+ */
+export function getRenderedImageWidth({
+	useLegacy,
+	slotWidth,
+	slotHeight,
+	intrinsicWidth,
+	intrinsicHeight,
+	focalPoint = null,
+	focalCrop = null,
+	captionBelowNaturalFlow = false,
+	objectFit = 'cover',
+}) {
+	if (!isValidPositiveNumber(slotWidth)) {
+		return undefined;
+	}
+	const tileWidth = Number(slotWidth);
+	const tile = {
+		slotWidth: tileWidth,
+		slotHeight,
+		intrinsicWidth,
+		intrinsicHeight,
+	};
+	const placement = getImagePlacement({
+		useLegacy,
+		focalPoint,
+		focalCrop,
+		captionBelowNaturalFlow,
+	});
+
+	switch (placement) {
+		case IMAGE_PLACEMENT.FOCAL_CROP: {
+			const scale = getFocalCropScale({ focalCrop, ...tile });
+			// Without tile/source dims the style spans the crop width over the
+			// container (`100 / width` %).
+			return scale === null
+				? tileWidth / focalCrop.width
+				: scale * Number(intrinsicWidth);
+		}
+		case IMAGE_PLACEMENT.NATURAL_FLOW:
+			return tileWidth;
+		case IMAGE_PLACEMENT.FILL:
+			return objectFit === 'contain'
+				? tileWidth
+				: getCoverImageWidth(tile);
+		case IMAGE_PLACEMENT.FOCAL_POINT:
+		case IMAGE_PLACEMENT.LEGACY:
+			return getCoverImageWidth(tile);
+		default:
+			return tileWidth;
+	}
+}
+
+/**
+ * Img style: legacy placement (position + top/left/width/height) or object-fit cover.
+ *
+ * @param {Object}                                                       params
+ * @param {boolean}                                                      params.useLegacy
+ * @param {number|null|undefined}                                        params.slotWidth
+ * @param {number|null|undefined}                                        params.slotHeight
+ * @param {number|string}                                                params.intrinsicWidth
+ * @param {number|string}                                                params.intrinsicHeight
+ * @param {string}                                                       params.valign
+ * @param {string}                                                       params.halign
+ * @param {{ x: number, y: number }|null}                                [params.focalPoint]
+ * @param {{ x: number, y: number, width: number, height: number }|null} [params.focalCrop]               0–1 rect on source (zoom + pan from editor).
+ * @param {boolean}                                                      [params.captionBelowNaturalFlow] Below-image captions without a fixed tile height (masonry, etc.).
+ * @param {'cover'|'contain'}                                            [params.objectFit]               Fill mode when not using legacy placement (default cover).
+ * @param {string}                                                       [params.objectPosition]          CSS object-position (default center center).
+ * @return {Object} React inline style for the `<img>`.
+ */
+export function getImgStyleForItem({
+	useLegacy,
+	slotWidth,
+	slotHeight,
+	intrinsicWidth,
+	intrinsicHeight,
+	valign,
+	halign,
+	focalPoint = null,
+	focalCrop = null,
+	captionBelowNaturalFlow = false,
+	objectFit = 'cover',
+	objectPosition = 'center center',
+}) {
+	const placement = getImagePlacement({
+		useLegacy,
+		focalPoint,
+		focalCrop,
+		captionBelowNaturalFlow,
+	});
+	if (placement === IMAGE_PLACEMENT.FOCAL_CROP) {
+		const x = focalCrop.x;
+		const y = focalCrop.y;
+		const w = focalCrop.width;
+		const iw = Number(intrinsicWidth);
+		const ih = Number(intrinsicHeight);
+		const k = getFocalCropScale({
+			focalCrop,
+			slotWidth,
+			slotHeight,
+			intrinsicWidth,
+			intrinsicHeight,
+		});
+
+		if (k !== null) {
+			const imgW = k * iw;
+			const imgH = k * ih;
+			const imgL = -k * x * iw;
+			const imgT = -k * y * ih;
+			return {
+				position: 'absolute',
+				left: imgL,
+				top: imgT,
+				width: imgW,
+				height: imgH,
+				maxWidth: 'none',
+				// Box matches bitmap aspect — fill equals uniform scale (unlike object-fit: cover on the slot).
+				objectFit: 'fill',
+				imageRendering: 'smooth',
+				// Mirrored for .modula img… { width:100% !important } in themes — see index.scss safety net.
+				'--modula-focal-w': `${imgW}px`,
+				'--modula-focal-h': `${imgH}px`,
+				'--modula-focal-left': `${imgL}px`,
+				'--modula-focal-top': `${imgT}px`,
+			};
+		}
+
+		/**
+		 * No tile / intrinsic dims yet: scale so crop width matches container width, pan with % translate.
+		 * Parent must be overflow:hidden + definite size (pictureAbsoluteFill in markup).
+		 */
+		const tf = `translate(-${x * 100}%, -${y * 100}%)`;
+		return {
+			position: 'absolute',
+			left: 0,
+			top: 0,
+			width: `${100 / w}%`,
+			height: 'auto',
+			maxWidth: 'none',
+			objectFit: 'fill',
+			transform: tf,
+			imageRendering: 'smooth',
+			'--modula-focal-w': `${100 / w}%`,
+			'--modula-focal-h': 'auto',
+			'--modula-focal-left': '0',
+			'--modula-focal-top': '0',
+			'--modula-focal-transform': tf,
+		};
+	}
+	if (placement === IMAGE_PLACEMENT.FOCAL_POINT) {
+		return {
+			width: '100%',
+			height: '100%',
+			objectFit: 'cover',
+			objectPosition: `${focalPoint.x * 100}% ${focalPoint.y * 100}%`,
+			imageRendering: 'smooth',
+		};
+	}
+	if (placement === IMAGE_PLACEMENT.NATURAL_FLOW) {
+		return {
+			display: 'block',
+			width: '100%',
+			height: 'auto',
+			maxWidth: '100%',
+			imageRendering: 'smooth',
+		};
+	}
+	if (placement === IMAGE_PLACEMENT.FILL) {
+		const fit = objectFit === 'contain' ? 'contain' : 'cover';
+		return {
+			width: '100%',
+			height: '100%',
+			objectFit: fit,
+			objectPosition,
+			// Prefer smooth scaling to avoid oversharpened look when image fills the slot
+			imageRendering: 'smooth',
+		};
+	}
+	return computeLegacyImageStyle(
+		Math.round(Number(slotWidth)),
+		Math.round(Number(slotHeight)),
+		Number(intrinsicWidth),
+		Number(intrinsicHeight),
+		valign,
+		halign
+	);
+}
+
+/**
+ * Build img element attributes (src, sizes, dimensions, style, etc.).
+ *
+ * @param {Object}      params
+ * @param {Object}      params.item            - Prepared item (prepareItemData)
+ * @param {Object}      params.itemData        - Raw item data
+ * @param {string}      params.imageSrc
+ * @param {string}      params.effectiveSizes
+ * @param {Object}      params.imgStyle        - From getImgStyleForItem
+ * @param {number|null} params.intrinsicWidth
+ * @param {number|null} params.intrinsicHeight
+ * @param {boolean}     params.lazyLoad
+ * @param {string}      params.imageSrcset
+ * @return {Object} Props for <img>
+ */
+export function buildImgAttrs({
+	item,
+	itemData,
+	imageSrc,
+	effectiveSizes,
+	imgStyle,
+	intrinsicWidth,
+	intrinsicHeight,
+	lazyLoad,
+	imageSrcset,
+}) {
+	const letterboxContainActive = itemUsesCustomGridLetterbox(itemData);
+	const focalCropActive = parseItemFocalCrop(itemData);
+	const focalPointActive =
+		!letterboxContainActive &&
+		!focalCropActive &&
+		Boolean(parseItemFocalPoint(itemData));
+	const focalTransitionOff =
+		letterboxContainActive || focalCropActive || focalPointActive;
+	const lazyEnabled = isLazyLoadEnabled(lazyLoad);
+	const inheritedAttrs = mergeReactClassNameProps(
+		normalizeReactDomProps(spreadAttrs(item.imgAttributes)),
+		[
+			...(item.imgClasses || []),
+			...(letterboxContainActive
+				? [MODULA_IMG_LETTERBOX_CONTAIN_CLASS]
+				: []),
+			...(focalCropActive ? [MODULA_IMG_FOCAL_CROP_CLASS] : []),
+			...(focalPointActive ? [MODULA_IMG_FOCAL_POINT_CLASS] : []),
+		]
+	);
+	// React 18 sets attributes in insertion order while the img is detached.
+	// Apply loading before src so lazy pictures do not eagerly fetch the fallback
+	// before joining their source elements and selecting a responsive candidate.
+	delete inheritedAttrs.src;
+	const imgAttrs = {
+		...inheritedAttrs,
+		loading: lazyEnabled ? 'lazy' : 'eager',
+		decoding: 'async',
+		alt: itemData?.alt || item?.title || '',
+		src: imageSrc,
+		// Inline beats theme `transition: all` on img; object-position is interpolable in CSS.
+		style: focalTransitionOff
+			? {
+					...imgStyle,
+					transition: 'none',
+					...(letterboxContainActive &&
+					typeof imgStyle?.objectPosition === 'string'
+						? {
+								'--modula-letterbox-position':
+									imgStyle.objectPosition,
+							}
+						: {}),
+				}
+			: imgStyle,
+	};
+	delete imgAttrs.srcset;
+	delete imgAttrs.srcSet;
+	// HTML width/height attrs fight CSS layout for focal-crop (scaled draw rect ≠ intrinsic).
+	if (intrinsicWidth && intrinsicHeight && !focalCropActive) {
+		imgAttrs.width = Number(intrinsicWidth);
+		imgAttrs.height = Number(intrinsicHeight);
+	}
+	if (effectiveSizes) {
+		imgAttrs.sizes = effectiveSizes;
+	}
+	const fullUrl =
+		itemData?.image_full ||
+		itemData?.imageFull ||
+		item?.imgAttributes?.['data-full'] ||
+		itemData?.img_attributes?.['data-full'];
+	if (fullUrl) {
+		imgAttrs['data-full'] = fullUrl;
+	}
+	return imgAttrs;
+}

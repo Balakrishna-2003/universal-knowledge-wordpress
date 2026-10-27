@@ -1,0 +1,54 @@
+/**
+ * Modula gallery edit — full-screen takeover (hides WP admin chrome).
+ * Loaded only when modula_gallery_takeover_ui is enabled.
+ *
+ * The pre-React boot shell (mount, spinner, desktop-only notice) is shared with
+ * the Albums editor: see takeover-boot.css.
+ */
+
+body.modula-gallery-takeover {
+	overflow: hidden !important;
+	height: auto !important;
+}
+
+body.modula-gallery-takeover #wpadminbar,
+body.modula-gallery-takeover #adminmenumain,
+body.modula-gallery-takeover #adminmenuback,
+body.modula-gallery-takeover #adminmenuwrap {
+	display: none !important;
+}
+
+body.modula-gallery-takeover #wpcontent {
+	margin-left: 0 !important;
+	padding-left: 0 !important;
+}
+
+body.modula-gallery-takeover #wpbody {
+	padding-top: 0 !important;
+}
+
+body.modula-gallery-takeover #wpbody-content {
+	padding-bottom: 0 !important;
+	margin-bottom: 0 !important;
+	float: none !important;
+}
+
+body.modula-gallery-takeover .wrap {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+body.modula-gallery-takeover #screen-meta,
+body.modula-gallery-takeover #screen-meta-links,
+body.modula-gallery-takeover #contextual-help-link-wrap {
+	display: none !important;
+}
+
+body.modula-gallery-takeover #wpfooter {
+	display: none !important;
+}
+
+/* Tooltips from @wordpress/components must render above this fixed layer (see WP .components-tooltip z-index). */
+body.modula-gallery-takeover .components-tooltip {
+	z-index: 1000102 !important;
+}

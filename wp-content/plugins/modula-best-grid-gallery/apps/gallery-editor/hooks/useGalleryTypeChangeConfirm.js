@@ -1,0 +1,194 @@
+import {
+	asGalleryItemList,
+	markCustomGridRepackAfterGalleryTypeChange,
+} from 'gallery-shared/preview';
+import { useCallback, useRef, useState } from '@wordpress/element';
+import { useQueryClient } from '@tanstack/react-query';
+import { useTakeoverSaveStatus } from 'editor-shell';
+import { cloneGroupedSettings } from '../form/useGallerySettingsForm';
+import { useGallerySettingsFormBundle } from '../form/GallerySettingsFormContext';
+import { buildPatchPayload } from '../logic/buildPatchPayload';
+import { collectPatchValidationErrors } from '../logic/collectPatchValidationErrors';
+import { getGalleryBootstrapQueryKey } from '../query/useGalleryBootstrapQuery';
+import { clearAllGalleryImageFocus } from '../utils/clearAllGalleryImageFocus';
+import { itemHasImageFocusData } from '../utils/itemHasImageFocus';
+import { getGalleryPreviewReduxStore } from '../utils/previewReduxStoreRef';
+import { getModulaSettingsEditorConfig } from '../config/modulaSettingsEditorConfig';
+import { applyGalleryTypeSideEffects } from '../logic/applyGalleryTypeSideEffects';
+import { dropGalleryEditorLayoutStepsIfNeeded } from '../utils/galleryEditorLayoutHistoryHygiene';
+import { GALLERY_SAVE_OWNERS } from '../constants/gallerySaveOwners';
+
+/**
+ * Modal + PATCH flow when changing `general.type` while slide/image focus data exists.
+ *
+ * @param {string} groupedPath Field `groupedPath` from schema (e.g. `layout.gutter`).
+ * @return {Object} `makeOnChange`, modal open/busy flags, cancel/confirm handlers, and `isGalleryTypeField`.
+ */
+export function useGalleryTypeChangeConfirm(groupedPath) {
+	const {
+		form,
+		patchMutation,
+		baselineRef,
+		acknowledgeSettingsSave,
+		getPendingSettingsPatch,
+		setClientError,
+		undoRedo,
+	} = useGallerySettingsFormBundle();
+	const { runPersistTask, setDirty } = useTakeoverSaveStatus();
+	const queryClient = useQueryClient();
+
+	const isGalleryTypeField = groupedPath === 'general.type';
+
+	const pendingGalleryTypeRef = useRef(null);
+	const [galleryTypeConfirmOpen, setGalleryTypeConfirmOpen] = useState(false);
+	const [galleryTypeConfirmBusy, setGalleryTypeConfirmBusy] = useState(false);
+
+	const handleGalleryTypeConfirmCancel = useCallback(() => {
+		if (galleryTypeConfirmBusy) {
+			return;
+		}
+		const pending = pendingGalleryTypeRef.current;
+		if (pending?.fieldApi && pending.prevValue !== undefined) {
+			form.setFieldValue('general.type', pending.prevValue);
+		}
+		setGalleryTypeConfirmOpen(false);
+		pendingGalleryTypeRef.current = null;
+	}, [galleryTypeConfirmBusy, form]);
+
+	const handleGalleryTypeConfirm = useCallback(async () => {
+		const pending = pendingGalleryTypeRef.current;
+		if (!pending) {
+			return;
+		}
+		const { fieldApi, nextValue } = pending;
+		const gid = getModulaSettingsEditorConfig().galleryId;
+		const previewStore = getGalleryPreviewReduxStore();
+		if (!gid || !previewStore) {
+			fieldApi.handleChange(nextValue);
+			dropGalleryEditorLayoutStepsIfNeeded(undoRedo.dropLayoutSteps, {
+				prevType: pending.prevValue,
+				nextType: nextValue,
+			});
+			setGalleryTypeConfirmOpen(false);
+			pendingGalleryTypeRef.current = null;
+			return;
+		}
+		setGalleryTypeConfirmBusy(true);
+		try {
+			await runPersistTask(async () => {
+				await clearAllGalleryImageFocus({
+					galleryId: gid,
+					store: previewStore,
+				});
+				fieldApi.handleChange(nextValue);
+				applyGalleryTypeSideEffects(form, pending.prevValue, nextValue);
+				markCustomGridRepackAfterGalleryTypeChange(
+					pending.prevValue,
+					nextValue,
+					previewStore.getState()?.items?.items
+				);
+				const v = cloneGroupedSettings(form.state.values);
+				if (!v.general || typeof v.general !== 'object') {
+					v.general = {};
+				}
+				v.general = { ...v.general, type: nextValue };
+				const patch = buildPatchPayload(v, baselineRef.current);
+				if (Object.keys(patch).length > 0) {
+					const errs = collectPatchValidationErrors(patch, v);
+					if (errs.length > 0) {
+						setClientError(errs.join('\n'));
+						throw new Error(errs[0]);
+					}
+					setClientError('');
+					const serverData = await patchMutation.mutateAsync(patch);
+					acknowledgeSettingsSave(v, serverData);
+					setDirty(
+						GALLERY_SAVE_OWNERS.settings,
+						Object.keys(getPendingSettingsPatch()).length > 0
+					);
+				}
+			}, 'settings');
+			await queryClient.refetchQueries({
+				queryKey: getGalleryBootstrapQueryKey(gid),
+			});
+			dropGalleryEditorLayoutStepsIfNeeded(undoRedo.dropLayoutSteps, {
+				prevType: pending.prevValue,
+				nextType: nextValue,
+			});
+			setGalleryTypeConfirmOpen(false);
+			pendingGalleryTypeRef.current = null;
+		} catch (e) {
+			const pendingErr = pendingGalleryTypeRef.current;
+			if (pendingErr?.fieldApi && pendingErr.prevValue !== undefined) {
+				form.setFieldValue('general.type', pendingErr.prevValue);
+			}
+			// eslint-disable-next-line no-console
+			console.error(e);
+		} finally {
+			setGalleryTypeConfirmBusy(false);
+		}
+	}, [
+		runPersistTask,
+		queryClient,
+		form,
+		patchMutation,
+		baselineRef,
+		acknowledgeSettingsSave,
+		getPendingSettingsPatch,
+		setDirty,
+		setClientError,
+		undoRedo,
+	]);
+
+	const makeOnChange = useCallback(
+		(fieldApi) => {
+			return (v) => {
+				if (!isGalleryTypeField) {
+					fieldApi.handleChange(v);
+					return;
+				}
+				const prev = fieldApi.state.value;
+				if (String(v ?? '') === String(prev ?? '')) {
+					return;
+				}
+				const previewStore = getGalleryPreviewReduxStore();
+				const items = previewStore?.getState()?.items?.items;
+				const hasFocus =
+					Array.isArray(items) &&
+					asGalleryItemList(items).some((row) =>
+						itemHasImageFocusData(row)
+					);
+				if (!hasFocus) {
+					form.setFieldValue('general.type', v);
+					applyGalleryTypeSideEffects(form, prev, v);
+					markCustomGridRepackAfterGalleryTypeChange(prev, v, items);
+					dropGalleryEditorLayoutStepsIfNeeded(
+						undoRedo.dropLayoutSteps,
+						{
+							prevType: prev,
+							nextType: v,
+						}
+					);
+					return;
+				}
+				pendingGalleryTypeRef.current = {
+					fieldApi,
+					nextValue: v,
+					prevValue: prev,
+				};
+				form.setFieldValue('general.type', v);
+				setGalleryTypeConfirmOpen(true);
+			};
+		},
+		[isGalleryTypeField, form, undoRedo]
+	);
+
+	return {
+		makeOnChange,
+		galleryTypeConfirmOpen,
+		galleryTypeConfirmBusy,
+		handleGalleryTypeConfirmCancel,
+		handleGalleryTypeConfirm,
+		isGalleryTypeField,
+	};
+}

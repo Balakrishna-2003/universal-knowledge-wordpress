@@ -1,0 +1,66 @@
+/**
+ * Modula album edit — full-screen takeover (hides WP admin chrome).
+ *
+ * The pre-React boot shell (mount, spinner, desktop-only notice) is shared with
+ * the gallery editor: see takeover-boot.css.
+ */
+
+body.modula-album-takeover {
+	overflow: hidden !important;
+	height: auto !important;
+}
+
+body.modula-album-takeover #wpadminbar,
+body.modula-album-takeover #adminmenumain,
+body.modula-album-takeover #adminmenuback,
+body.modula-album-takeover #adminmenuwrap {
+	display: none !important;
+}
+
+body.modula-album-takeover #wpcontent {
+	margin-left: 0 !important;
+	padding-left: 0 !important;
+}
+
+body.modula-album-takeover #wpbody {
+	padding-top: 0 !important;
+}
+
+body.modula-album-takeover #wpbody-content {
+	padding-bottom: 0 !important;
+	margin-bottom: 0 !important;
+	float: none !important;
+}
+
+body.modula-album-takeover .wrap {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+body.modula-album-takeover #screen-meta,
+body.modula-album-takeover #screen-meta-links,
+body.modula-album-takeover #contextual-help-link-wrap {
+	display: none !important;
+}
+
+body.modula-album-takeover #wpfooter {
+	display: none !important;
+}
+
+/* Tooltips from @wordpress/components must render above this fixed layer (see WP .components-tooltip z-index). */
+body.modula-album-takeover .components-tooltip {
+	z-index: 1000102 !important;
+}
+
+body.modula-album-takeover #post-body,
+body.modula-album-takeover #poststuff,
+body.modula-album-takeover #postbox-container-1,
+body.modula-album-takeover #postbox-container-2,
+body.modula-album-takeover .postbox {
+	display: none !important;
+}
+
+body.modula-album-takeover #titlediv,
+body.modula-album-takeover #post-body-content {
+	display: none !important;
+}
