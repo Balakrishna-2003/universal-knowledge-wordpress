@@ -35,6 +35,7 @@
                     'post_status'    => 'publish',
                     'category_name'  => 'inspirational-videos',
                     'posts_per_page' => 6,
+                    'order_by'       => 'DESC'
                 );
                 $video_query = new WP_Query($args);
 

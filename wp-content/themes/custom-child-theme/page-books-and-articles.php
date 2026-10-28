@@ -1028,52 +1028,52 @@ get_header();
                 ?>
 
                 <!-- Image 1 -->
-                <div class="col-lg-4 col-md-6 col-6">
+                <!-- <div class="col-lg-4 col-md-6 col-6">
                     <div class="gifts-img-card">
                         <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/books-and-articles/gifts/img-1.webp"
                             alt="Gift Item" loading="lazy">
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Image 2 -->
-                <div class="col-lg-4 col-md-6 col-6">
+                <!-- <div class="col-lg-4 col-md-6 col-6">
                     <div class="gifts-img-card">
                         <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/books-and-articles/gifts/img-2.webp"
                             alt="Gift Item" loading="lazy">
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Image 3 -->
-                <div class="col-lg-4 col-md-6 col-6">
+                <!-- <div class="col-lg-4 col-md-6 col-6">
                     <div class="gifts-img-card">
                         <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/books-and-articles/gifts/img-3.webp"
                             alt="Gift Item" loading="lazy">
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Image 4 -->
-                <div class="col-lg-4 col-md-6 col-6">
+                <!-- <div class="col-lg-4 col-md-6 col-6">
                     <div class="gifts-img-card">
                         <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/books-and-articles/gifts/img-4.webp"
                             alt="Gift Item" loading="lazy">
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Image 5 -->
-                <div class="col-lg-4 col-md-6 col-6">
+                <!-- <div class="col-lg-4 col-md-6 col-6">
                     <div class="gifts-img-card">
                         <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/books-and-articles/gifts/img-5.webp"
                             alt="Gift Item" loading="lazy">
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Image 6 -->
-                <div class="col-lg-4 col-md-6 col-6">
+                <!-- <div class="col-lg-4 col-md-6 col-6">
                     <div class="gifts-img-card">
                         <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/books-and-articles/gifts/img-6.webp"
                             alt="Gift Item" loading="lazy">
                     </div>
-                </div>
+                </div> -->
 
             </div>
             <!-- /GIFTS IMAGE GALLERY -->
