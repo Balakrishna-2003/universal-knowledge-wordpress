@@ -349,7 +349,36 @@
                             </figure>
                             <div class="ukt-past-program-body">
                                 <div class="d-flex flex-wrap gap-2 mb-3">
-                                    <?php
+                                    <!-- Category Pills (Limited to 3 categories or 24 characters) -->
+                                        <?php if ( ! empty( $categories ) ) : ?>
+                                            <!-- <div class="d-flex flex-wrap gap-2 mb-3"> -->
+                                                <?php
+                                                $serial = 1;
+                                                $cat_count = 0; // Initialize counter
+                                                
+                                                foreach ($categories as $category) {
+                                                    $cat_count += mb_strlen($category->name);
+                                                    
+                                                    if ($serial <= 3 && $cat_count <= 24) {
+                                                        ?>
+                                                        <span class="ukt-press-badge"><?php echo esc_html($category->name); ?></span>
+                                                        <?php
+                                                        $serial++;
+                                                    } else if($serial == 1){
+                                                        ?>
+                                                        <span class="ukt-press-badge"><?php echo esc_html($category->name); ?></span>
+                                                        <?php
+                                                        echo '<span>...</span>';
+                                                        break;
+                                                    } else {
+                                                        echo '<span>...</span>';
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                            <!-- </div> -->
+                                        <?php endif; ?>
+                                    <!-- <?php
                                         $serial = 1;
                                         foreach ($categories as $category) {
                                             // echo esc_html($category->name);
@@ -360,11 +389,11 @@
                                         <?php
                                                 $serial++;
                                             } else {
-                                                echo '<span>...<span>';
+                                                echo '<span>...</span>';
                                                 break;
                                             }
                                         }
-                                        ?>
+                                        ?> -->
                                     <!-- <span class="ukt-past-program-pill">Training</span>
                                     <span class="ukt-past-program-pill">School Children</span> -->
                                 </div>
