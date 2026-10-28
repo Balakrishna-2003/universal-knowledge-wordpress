@@ -1450,6 +1450,40 @@ Other members of the Trust, Hlr. Narendar Kumar, Prof. Hlr. Krishnanand Shenoy, 
     </section>
 
 </article>
+    <!-- =========================================================
+     FULL SCREEN GALLERY LIGHTBOX MODAL
+========================================================== -->
+    <div id="uktGalleryLightbox" class="ukt-gallery-lightbox" aria-hidden="true" role="dialog"
+        aria-label="Image Full Screen Preview">
+        <div class="ukt-lightbox-backdrop"></div>
+
+        <div class="ukt-lightbox-container">
+            <!-- Top Controls -->
+            <div class="ukt-lightbox-header">
+                <span class="ukt-lightbox-counter" id="uktLightboxCounter">1 / 6</span>
+                <button type="button" class="ukt-lightbox-close" id="uktLightboxClose" aria-label="Close preview">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <!-- Main Image Wrapper -->
+            <div class="ukt-lightbox-content">
+                <button type="button" class="ukt-lightbox-nav ukt-lightbox-prev" id="uktLightboxPrev"
+                    aria-label="Previous image">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <div class="ukt-lightbox-image-wrap">
+                    <img id="uktLightboxImage" src="" alt="Full Screen Preview" class="ukt-lightbox-img">
+                </div>
+
+                <button type="button" class="ukt-lightbox-nav ukt-lightbox-next" id="uktLightboxNext"
+                    aria-label="Next image">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
 
 <script>
