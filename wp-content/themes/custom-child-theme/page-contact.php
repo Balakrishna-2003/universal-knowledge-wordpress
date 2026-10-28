@@ -159,65 +159,9 @@
                                     <p class="text-muted mb-4 small">
                                         Please submit your details below and our team will get back to you promptly.
                                     </p>
+                                    <?php the_content(); ?>
 
-                                    <form id="uktContactForm" class="d-flex flex-column gap-3">
-                                        <div class="row g-3">
-                                            <div class="col-sm-6">
-                                                <label for="contactName" class="form-label small fw-bold text-dark mb-1">Your Full Name *</label>
-                                                <input type="text" class="form-control ukt-form-control" id="contactName" placeholder="e.g. Ananya Rao" required>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <label for="contactEmail" class="form-label small fw-bold text-dark mb-1">Email Address *</label>
-                                                <input type="email" class="form-control ukt-form-control" id="contactEmail" placeholder="e.g. name@example.com" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="row g-3">
-                                            <div class="col-sm-6">
-                                                <label for="contactPhone" class="form-label small fw-bold text-dark mb-1">Phone / WhatsApp Number *</label>
-                                                <input type="tel" class="form-control ukt-form-control" id="contactPhone" placeholder="+91 98450 82856" required>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <label for="contactSubject" class="form-label small fw-bold text-dark mb-1">Area of Interest</label>
-                                                <select class="form-select ukt-form-control" id="contactSubject">
-                                                    <option value="General Inquiry" selected>General Inquiry</option>
-                                                    <option value="Self Healing & Energy Healing">Self Healing &amp; Energy Healing</option>
-                                                    <option value="Golden Healing Hands (GHH) Training">Golden Healing Hands (GHH) Training</option>
-                                                    <option value="School & Youth Training Programs">School &amp; Youth Training Programs</option>
-                                                    <option value="Agnihotra Practices & Sessions">Agnihotra Practices &amp; Sessions</option>
-                                                    <option value="Internet Safety & Support">Internet Safety &amp; Support</option>
-                                                    <option value="Donations & Humanitarian Missions">Donations &amp; Humanitarian Missions</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label for="contactMessage" class="form-label small fw-bold text-dark mb-1">Your Message or Query *</label>
-                                            <textarea class="form-control ukt-form-control" id="contactMessage" rows="4" placeholder="How can we assist you or what would you like to know?" required></textarea>
-                                        </div>
-
-                                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-2">
-                                            <button type="submit" class="ukt-hero-primary-action border-0 ukt-btn-send-message">
-                                                Send Message <i class="bi bi-send-fill ms-2"></i>
-                                            </button>
-                                            <div class="small text-muted">
-                                                <i class="bi bi-shield-check text-success me-1"></i> Your details are kept strictly confidential.
-                                            </div>
-                                        </div>
-                                        <div class="mt-auto pt-3 ukt-schedule-note-box">
-                                            <div class="d-flex align-items-start gap-2">
-                                                <i class="bi bi-info-circle-fill text-success fs-5 flex-shrink-0 mt-1"></i>
-                                                <p class="mb-0 text-muted small">
-                                                    For personal healing appointments with our healers or to register for upcoming workshops, prior appointment or pre-registration is recommended.
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Submission Success Alert -->
-                                        <div id="contactFormFeedback" class="alert alert-success mt-3 py-2 px-3 d-none ukt-feedback-alert" role="alert">
-                                            <i class="bi bi-check-circle-fill me-1"></i> Thank you! Your message has been prepared. We will connect with you shortly.
-                                        </div>
-                                    </form>
+                                    
                                 </div>
                             </div>
 

@@ -60,25 +60,25 @@ add_action('wp_enqueue_scripts', 'twentytwentyfive_child_enqueue_assets');
 /**
  * Force allow PDF uploads and handle alternative MIME types.
  */
-// function ukt_allow_pdf_uploads( $mimes ) {
-//     $mimes['pdf'] = 'application/pdf';
-//     $mimes['pdf'] = 'application/x-pdf';
-//     return $mimes;
-// }
-// add_filter( 'upload_mimes', 'ukt_allow_pdf_uploads' );
+function ukt_allow_pdf_uploads( $mimes ) {
+    $mimes['pdf'] = 'application/pdf';
+    $mimes['pdf'] = 'application/x-pdf';
+    return $mimes;
+}
+add_filter( 'upload_mimes', 'ukt_allow_pdf_uploads' );
 
 /**
  * Bypass strict real-mime check if the server misreads the PDF header.
  */
-// add_filter( 'wp_check_filetype_and_ext', function( $filedata, $file, $filename, $mimes ) {
-//     $ext = pathinfo( $filename, PATHINFO_EXTENSION );
-//     if ( 'pdf' === strtolower( $ext ) ) {
-//         $filedata['ext']  = 'pdf';
-//         $filedata['type'] = 'application/pdf';
-//         $filedata['proper_filename'] = $filename;
-//     }
-//     return $filedata;
-// }, 10, 4 );
+add_filter( 'wp_check_filetype_and_ext', function( $filedata, $file, $filename, $mimes ) {
+    $ext = pathinfo( $filename, PATHINFO_EXTENSION );
+    if ( 'pdf' === strtolower( $ext ) ) {
+        $filedata['ext']  = 'pdf';
+        $filedata['type'] = 'application/pdf';
+        $filedata['proper_filename'] = $filename;
+    }
+    return $filedata;
+}, 10, 4 );
 
 
 
@@ -503,10 +503,10 @@ function ukt_e_letters_metabox_render($post) {
                         const allowedExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
                         
                         // Check if the MIME type or extension is NOT in our allowed lists
-                        if (allowedMimeTypes.indexOf(att.mime) === -1 || allowedExts.indexOf(fileExt) === -1) {
-                            alert('Invalid file type!\n\nPlease upload only PDF, Word (.doc/.docx), Excel (.xls/.xlsx), or PowerPoint (.ppt/.pptx) files.');
-                            return; // Stop execution, do not save the file data
-                        }
+                        // if (allowedMimeTypes.indexOf(att.mime) === -1 || allowedExts.indexOf(fileExt) === -1) {
+                        //     alert('Invalid file type!\n\nPlease upload only PDF, Word (.doc/.docx), Excel (.xls/.xlsx), or PowerPoint (.ppt/.pptx) files.');
+                        //     return; 
+                        // }
 
                         // 3. If valid, populate the form
                         $form.find('.ukt-el-file-id').val(att.id);
