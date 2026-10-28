@@ -7,7 +7,7 @@
 
     <!-- =========================================================
          ABOUT US BANNER / HERO SECTION
-         (Matches index.html showcase hero layout)
+         (Matches index showcase hero layout)
     ========================================================== -->
     <section class="ukt-hero-showcase">
         <div class="ukt-hero-slide-layout">
@@ -69,7 +69,7 @@
 
     <!-- =========================================================
          WELCOME SECTION
-         (Matches index.html welcome section theme and styling)
+         (Matches index welcome section theme and styling)
     ========================================================== -->
     <section class="ukt-home-welcome-section" id="welcome">
         <div class="container">
@@ -181,7 +181,7 @@
                         <p class="ukt-founder-bio-p">
                             As a Natural Positive Energy Healer, Rohan has successfully healed thousands of
                             individuals worldwide through distance healing. He is the brain child behind <strong><a
-                                    href="parivarthan-apps.html" class="app-a"> Parivarthan App</a></strong> which
+                                    href="<?php echo home_url('parivarthan-apps'); ?>" class="app-a"> Parivarthan App</a></strong> which
                             is a one of kind Healing and wellness app.
                         </p>
                         <p class="ukt-founder-bio-p">
@@ -250,7 +250,7 @@
                         <div class="ukt-founder-books-cards-grid">
 
                             <!-- Book 1 -->
-                            <a href="books-and-articles.html" class="ukt-founder-book-card">
+                            <a href="<?php echo home_url('books-and-articles'); ?>" class="ukt-founder-book-card">
                                 <div class="ukt-founder-book-cover-wrap">
                                     <img src="http://localhost/universal-knowledge-trust-wordpress/wp-content/themes/custom-child-theme/assets/images/about-us-images/learning-made-easy-with-positive-energy-193x300.jpg"
                                         alt="Learning made easy with Positive energy – Book by Rohan Michael Shiri"
@@ -265,7 +265,7 @@
                             </a>
 
                             <!-- Book 2 -->
-                            <a href="books-and-articles.html" class="ukt-founder-book-card">
+                            <a href="<?php echo home_url('books-and-articles'); ?>" class="ukt-founder-book-card">
                                 <div class="ukt-founder-book-cover-wrap">
                                     <img src="http://localhost/universal-knowledge-trust-wordpress/wp-content/themes/custom-child-theme/assets/images/about-us-images/way-of-life-for-better-generation-188x300.jpg"
                                         alt="Way of life for Better Generation – Book by Rohan Michael Shiri"
@@ -279,7 +279,7 @@
                             </a>
 
                             <!-- Book 3 -->
-                            <a href="books-and-articles.html" class="ukt-founder-book-card">
+                            <a href="<?php echo home_url('books-and-articles'); ?>" class="ukt-founder-book-card">
                                 <div class="ukt-founder-book-cover-wrap">
                                     <img src="http://localhost/universal-knowledge-trust-wordpress/wp-content/themes/custom-child-theme/assets/images/about-us-images/vishwachethana-dena-shakthishali-300x154.jpg"
                                         alt="Vishwachethana dena shakthishali Jeevana – Book by Rohan Michael Shiri"
@@ -293,7 +293,7 @@
                             </a>
 
                             <!-- Book 4 -->
-                            <a href="books-and-articles.html" class="ukt-founder-book-card">
+                            <a href="<?php echo home_url('books-and-articles'); ?>" class="ukt-founder-book-card">
                                 <div class="ukt-founder-book-cover-wrap">
                                     <img src="http://localhost/universal-knowledge-trust-wordpress/wp-content/themes/custom-child-theme/assets/images/about-us-images/life-quotes-positve-quote-for-life-time-300x222.jpg"
                                         alt="Life Quotes – Positive Quote for life time – Book by Rohan Michael Shiri"
@@ -308,7 +308,7 @@
                             </a>
 
                             <!-- Book 5 -->
-                            <a href="books-and-articles.html" class="ukt-founder-book-card">
+                            <a href="<?php echo home_url('books-and-articles'); ?>" class="ukt-founder-book-card">
                                 <div class="ukt-founder-book-cover-wrap">
                                     <img src="http://localhost/universal-knowledge-trust-wordpress/wp-content/themes/custom-child-theme/assets/images/about-us-images/you-are-what-you-are.jpg"
                                         alt="You are what you are – Book by Rohan Michael Shiri" loading="lazy">
@@ -321,7 +321,7 @@
                             </a>
 
                             <!-- Book 6 -->
-                            <a href="books-and-articles.html" class="ukt-founder-book-card">
+                            <a href="<?php echo home_url('books-and-articles'); ?>" class="ukt-founder-book-card">
                                 <div class="ukt-founder-book-cover-wrap">
                                     <img src="http://localhost/universal-knowledge-trust-wordpress/wp-content/themes/custom-child-theme/assets/images/about-us-images/it's-a-squred-world.jpg"
                                         alt="You are what you are – Book by Rohan Michael Shiri" loading="lazy">
@@ -897,7 +897,7 @@
                                 <span class="ukt-prog-extra-note"
                                     title="English with Kannada, Hindi, Tamil, Malayalam translations">Eng / Kan /
                                     Hin / Tam / Mal</span>
-                                <a href="parivarthan-apps.html" class="ukt-prog-action-link">
+                                <a href="<?php echo home_url('parivarthan-apps'); ?>" class="ukt-prog-action-link">
                                     Join via App <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
@@ -929,7 +929,7 @@
                             </div>
                             <div class="ukt-prog-card-bottom">
                                 <span class="ukt-prog-extra-note" title="Language: English">Language: English</span>
-                                <a href="parivarthan-apps.html" class="ukt-prog-action-link">
+                                <a href="<?php echo home_url('parivarthan-apps'); ?>" class="ukt-prog-action-link">
                                     Join via App <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
@@ -1184,7 +1184,7 @@ April Summer Camp
                                 <span class="ukt-prog-extra-note"
                                     title="Host a free healing camp in your city (200 capacity hall)">Host / Attend
                                     Camp</span>
-                                <a href="parivarthan-apps.html" class="ukt-prog-action-link">
+                                <a href="<?php echo home_url('parivarthan-apps'); ?>" class="ukt-prog-action-link">
                                     Join via App <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
@@ -1439,10 +1439,10 @@ Other members of the Trust, Hlr. Narendar Kumar, Prof. Hlr. Krishnanand Shenoy, 
                 community feeding initiatives, your presence brings light.
             </p>
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <a href="e-letters.html" class="ukt-hero-primary-action ukt-cta-btn-primary">
+                <a href="<?php echo home_url('e-letter'); ?>" class="ukt-hero-primary-action ukt-cta-btn-primary">
                     Explore E-letters <i class="bi bi-arrow-right"></i>
                 </a>
-                <a href="contact.html" class="ukt-hero-secondary-action ukt-cta-btn-secondary">
+                <a href="<?php echo home_url('contact-us'); ?>" class="ukt-hero-secondary-action ukt-cta-btn-secondary">
                     Get In Touch
                 </a>
             </div>

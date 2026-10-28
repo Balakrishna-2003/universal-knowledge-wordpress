@@ -289,7 +289,7 @@ get_header();
                 hearts.
             </p>
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <a href="index.html#programs" class="ukt-hero-primary-action ukt-cta-btn-gold">
+                <a href="<?php echo home_url('our-training-programs'); ?>" class="ukt-hero-primary-action ukt-cta-btn-gold">
                     Explore Programs <i class="bi bi-arrow-right"></i>
                 </a>
                 <a href="mailto:UniversalknowledgR@gmail.com"

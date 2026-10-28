@@ -281,7 +281,7 @@ get_header();
                 initiatives can inspire lasting positive change in your life and community.
             </p>
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <a href="all-school-training-programs.html" class="ukt-hero-primary-action ukt-cta-btn-gold">
+                <a href="<?php echo home_url('our-training-programs'); ?>" class="ukt-hero-primary-action ukt-cta-btn-gold">
                     Explore Programs <i class="bi bi-arrow-right"></i>
                 </a>
                 <a href="mailto:UniversalknowledgR@gmail.com" class="ukt-hero-secondary-action ukt-cta-btn-ghost">

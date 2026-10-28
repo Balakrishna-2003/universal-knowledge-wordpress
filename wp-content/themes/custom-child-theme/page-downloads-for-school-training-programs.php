@@ -665,7 +665,7 @@ default:
 
     <!-- =====================================================
          CALL TO ACTION SECTION
-         (Matches index.html & about-us page CTA layout)
+         (Matches index & about-us page CTA layout)
     ===================================================== -->
     <section class="ukt-cta-section">
 

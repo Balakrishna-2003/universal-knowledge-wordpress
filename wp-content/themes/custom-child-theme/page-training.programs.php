@@ -156,7 +156,7 @@
                                             If any schools or corporations would like to know more about the program then they can connect with Universal Knowledge Trust Team.
                                         </p>
                                     </div>
-                                    <a href="contact.html" class="ukt-program-cta-btn">
+                                    <a href="<?php echo home_url('contact-us'); ?>" class="ukt-program-cta-btn">
                                         Connect With Us <i class="bi bi-arrow-right"></i>
                                     </a>
                                 </div>
@@ -369,7 +369,7 @@
                                     <span class="ukt-past-program-pill">School Children</span> -->
                                 </div>
                                 <h3 class="ukt-past-program-title">
-                                    <a href="learning-made-easy-with-postive-energy.html">
+                                    <a href="<?php echo get_the_permalink(); ?>">
                                         <?php echo $title; ?>
                                     </a>
                                 </h3>

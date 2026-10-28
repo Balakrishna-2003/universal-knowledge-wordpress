@@ -122,7 +122,7 @@ get_header();
 
 
                                         <a
-                                            href="universal-knowledge-trust-training-programs.html"
+                                            href="<?php echo home_url('/our-training-programs'); ?>"
                                             class="ukt-hero-secondary-action"
                                         >
                                             Join a Program
@@ -240,7 +240,7 @@ get_header();
                                     <div class="ukt-hero-action-row">
 
                                         <a
-                                            href="universal-knowledge-trust-category-healing.html"
+                                            href="<?php echo home_url('all-healing-programs'); ?>"
                                             class="ukt-hero-primary-action"
                                         >
                                             Explore Healing
@@ -249,7 +249,7 @@ get_header();
 
 
                                         <a
-                                            href="about-us.html"
+                                            href="<?php echo home_url('about-us'); ?>"
                                             class="ukt-hero-secondary-action"
                                         >
                                             Know More
@@ -365,7 +365,7 @@ get_header();
                                     <div class="ukt-hero-action-row">
 
                                         <a
-                                            href="universal-knowledge-trust-our-events.html"
+                                            href="<?php echo home_url('all-our-events'); ?>"
                                             class="ukt-hero-primary-action"
                                         >
                                             Explore Activities
@@ -374,7 +374,7 @@ get_header();
 
 
                                         <a
-                                            href="contact.html"
+                                            href="<?php echo home_url('contact-us'); ?>"
                                             class="ukt-hero-secondary-action"
                                         >
                                             Join Us
@@ -580,12 +580,12 @@ get_header();
 
                     <div class="ukt-home-welcome-buttons">
 
-                        <a href="about-us.html" class="ukt-home-welcome-primary-btn">
+                        <a href="<?php echo home_url('about-us'); ?>" class="ukt-home-welcome-primary-btn">
                             Explore Our Journey
                             <i class="bi bi-arrow-right"></i>
                         </a>
 
-                        <a href="contact.html" class="ukt-home-welcome-secondary-btn">
+                        <a href="<?php echo home_url('contact-us'); ?>" class="ukt-home-welcome-secondary-btn">
                             Connect With Us
                         </a>
 
@@ -1266,7 +1266,7 @@ get_header();
             <h3>21 Days Upliftment Program</h3>
             <p>Transform your life through a meaningful journey of awareness, growth and positive change. </p>
 
-            <a href="about-us.html#programs" class="ukt-program-link">
+            <a href="<?php echo home_url('about-us'); ?>#programs" class="ukt-program-link">
                 <span>KNOW MORE</span>
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -1287,7 +1287,7 @@ get_header();
             <h3>Self Healing</h3>
             <p>Learn simple and meaningful practices that support personal wellbeing and inner balance.</p>
 
-            <a href="about-us.html#programs" class="ukt-program-link">
+            <a href="<?php echo home_url('about-us'); ?>#programs" class="ukt-program-link">
                 <span>KNOW MORE</span>
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -1308,7 +1308,7 @@ get_header();
             <h3>Inner Growth</h3>
             <p>Awaken your potential and begin a journey towards greater awareness and transformation.</p>
 
-            <a href="about-us.html#programs" class="ukt-program-link">
+            <a href="<?php echo home_url('about-us'); ?>#programs" class="ukt-program-link">
                 <span>KNOW MORE</span>
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -1329,7 +1329,7 @@ get_header();
             <h3>Training Programs</h3>
             <p>Empowering individuals and communities through knowledge, learning and practical experiences.</p>
 
-            <a href="about-us.html#programs" class="ukt-program-link">
+            <a href="<?php echo home_url('about-us'); ?>#programs" class="ukt-program-link">
                 <span>KNOW MORE</span>
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -1350,7 +1350,7 @@ get_header();
             <h3>Retreats</h3>
             <p>Step away from everyday life and experience peace, silence, reflection and renewal.</p>
 
-            <a href="about-us.html#programs" class="ukt-program-link">
+            <a href="<?php echo home_url('about-us'); ?>#programs" class="ukt-program-link">
                 <span>KNOW MORE</span>
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -1371,7 +1371,7 @@ get_header();
             <h3>Universal Talks</h3>
             <p>Meaningful conversations, ideas and experiences that inspire awareness and transformation. </p>
 
-            <a href="about-us.html#programs" class="ukt-program-link">
+            <a href="<?php echo home_url('about-us'); ?>#programs" class="ukt-program-link">
                 <span>KNOW MORE</span>
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -1384,7 +1384,7 @@ get_header();
         <!-- BUTTON -->
         <div class="text-center ukt-programs-bottom">
 
-            <a href="about-us.html#programs" class="ukt-programs-all-button">
+            <a href="<?php echo home_url('about-us'); ?>#programs" class="ukt-programs-all-button">
                 VIEW ALL PROGRAMS
                 <i class="bi bi-arrow-right"></i>
             </a>
@@ -1643,12 +1643,12 @@ get_header();
 
                     <div class="ukt-cta-actions">
 
-                        <a href="universal-knowledge-trust-training-programs.html" class="ukt-cta-primary-btn">
+                        <a href="<?php echo home_url('our-training-programs'); ?>" class="ukt-cta-primary-btn">
                             <span>EXPLORE OUR PROGRAMS</span>
                             <i class="bi bi-arrow-up-right"></i>
                         </a>
 
-                        <a href="contact.html" class="ukt-cta-secondary-btn">
+                        <a href="<?php echo home_url('contact-us'); ?>" class="ukt-cta-secondary-btn">
                             <span>GET IN TOUCH</span>
                         </a>
 

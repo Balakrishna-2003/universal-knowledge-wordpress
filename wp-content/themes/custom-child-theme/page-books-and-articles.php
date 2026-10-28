@@ -217,7 +217,7 @@ get_header();
         </div>
     </section> <!-- =========================================================
              SECTION: ARTICLES & MEDIA COVERAGE
-             (Picked from press-release.html with 9-article pagination)
+             (Picked from press-release with 9-article pagination)
         ========================================================== -->
     <section id="articles" class="ukt-books-articles-section">
         <div class="container">
@@ -1083,7 +1083,7 @@ get_header();
 
     <!-- =========================================================
          CALL TO ACTION SECTION
-         (Matches about-us.html CTA section style)
+         (Matches about-us CTA section style)
     ========================================================== -->
     <section class="ukt-cta-section ukt-cta-dark">
         <div class="container text-center">
@@ -1096,7 +1096,7 @@ get_header();
                 community feeding initiatives, your presence brings light.
             </p>
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <a href="index.html#programs" class="ukt-hero-primary-action ukt-cta-btn-primary">
+                <a href="<?php echo home_url('our-training-programs'); ?>" class="ukt-hero-primary-action ukt-cta-btn-primary">
                     Explore Programs <i class="bi bi-arrow-right"></i>
                 </a>
                 <a href="mailto:UniversalknowledgR@gmail.com" class="ukt-hero-secondary-action ukt-cta-btn-secondary">

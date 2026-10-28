@@ -6,7 +6,7 @@ switch ($page_slug) {
         ?>
             <!-- =========================================================
          E-LETTERS BANNER / HERO SECTION
-         (Matches index.html showcase hero layout)
+         (Matches index showcase hero layout)
     ========================================================== -->
     <section class="ukt-hero-showcase">
         <div class="ukt-hero-slide-layout">
@@ -71,7 +71,7 @@ switch ($page_slug) {
         ?>
         <!-- =========================================================
          INSPIRATIONAL VIDEOS HERO SHOWCASE SECTION
-         (Matches index.html showcase hero layout)
+         (Matches index showcase hero layout)
     ========================================================== -->
     <section class="ukt-hero-showcase">
         <div class="ukt-hero-slide-layout">
@@ -136,7 +136,7 @@ switch ($page_slug) {
         ?>
         <!-- =========================================================
          BOOKS & ARTICLES BANNER / HERO SECTION
-         (Matches index.html showcase hero layout)
+         (Matches index showcase hero layout)
     ========================================================== -->
         <section class="ukt-hero-showcase">
             <div class="ukt-hero-slide-layout">
@@ -201,7 +201,7 @@ switch ($page_slug) {
         ?>
         <!-- =========================================================
              PRESS RELEASE BANNER / HERO SECTION
-             (Matches index.html showcase hero layout & spacing)
+             (Matches index showcase hero layout & spacing)
         ========================================================== -->
     <section class="ukt-hero-showcase">
         <div class="ukt-hero-carousel-shell">
@@ -356,7 +356,7 @@ switch ($page_slug) {
         ?>
         <!-- =========================================================
              PROGRAM TESTIMONIALS BANNER / HERO SECTION
-             (Matches index.html showcase hero layout & spacing)
+             (Matches index showcase hero layout & spacing)
         ========================================================== -->
         <section class="ukt-hero-showcase">
             <div class="ukt-hero-carousel-shell">
@@ -497,7 +497,7 @@ switch ($page_slug) {
         ?>
         <!-- =========================================================
              NATURE RETREATS BANNER / HERO SECTION
-             (Matches index.html showcase hero layout)
+             (Matches index showcase hero layout)
         ========================================================== -->
     <section class="ukt-hero-showcase">
         <div class="ukt-hero-slide-layout">
@@ -559,7 +559,7 @@ switch ($page_slug) {
         ?>
         <!-- =========================================================
          ABOUT US BANNER / HERO SECTION
-         (Matches index.html showcase hero layout)
+         (Matches index showcase hero layout)
     ========================================================== -->
     <section class="ukt-hero-showcase">
         <div class="ukt-hero-slide-layout">
@@ -622,7 +622,7 @@ switch ($page_slug) {
         ?>
                         <!-- =========================================================
              NATURE RETREATS BANNER / HERO SECTION
-             (Matches index.html showcase hero layout)
+             (Matches index showcase hero layout)
         ========================================================== -->
         <section class="ukt-hero-showcase">
             <div class="ukt-hero-slide-layout">
@@ -685,7 +685,7 @@ switch ($page_slug) {
         ?>
         <!-- =========================================================
              SCHOOL TRAINING PROGRAMS BANNER / HERO SECTION
-             (Matches index.html showcase hero layout)
+             (Matches index showcase hero layout)
         ========================================================== -->
     <section class="ukt-hero-showcase">
         <div class="ukt-hero-slide-layout">
@@ -751,7 +751,7 @@ switch ($page_slug) {
         ?>
         <!-- =========================================================
          E-LETTERS BANNER / HERO SECTION
-         (Matches index.html showcase hero layout)
+         (Matches index showcase hero layout)
     ========================================================== -->
     <section class="ukt-hero-showcase">
         <div class="ukt-hero-slide-layout">
@@ -1047,7 +1047,7 @@ switch ($page_slug) {
         ?>
              <!-- =========================================================
              CAMPS & WORKSHOPS BANNER / HERO SECTION
-             (Matches index.html showcase hero layout)
+             (Matches index showcase hero layout)
         ========================================================== -->
     <section class="ukt-hero-showcase">
             <div class="ukt-hero-slide-layout">
@@ -1293,7 +1293,7 @@ switch ($page_slug) {
         ?>
         <!-- =========================================================
          CONTACT US BANNER / HERO SECTION
-         (Matches index.html showcase hero layout)
+         (Matches index showcase hero layout)
     ========================================================== -->
         <section class="ukt-hero-showcase">
             <div class="ukt-hero-slide-layout">

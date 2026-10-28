@@ -331,7 +331,7 @@
 
         <!-- =========================================================
          CALL TO ACTION SECTION
-         (Matches about-us.html CTA section style)
+         (Matches about-us CTA section style)
     ========================================================== -->
         <section class="ukt-cta-section ukt-contact-cta-section">
             <div class="container text-center">
