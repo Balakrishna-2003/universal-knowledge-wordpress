@@ -281,6 +281,7 @@ get_header();
                                 ?>
 
                                 <div class="col-lg-4 col-md-6 col-12 press-article-item">
+                                    <a href="<?php echo get_the_permalink(); ?>">
                                     <article class="ukt-article-card">
                                         <!-- Cover Image Container -->
                                         <figure class="ukt-article-cover">
@@ -326,6 +327,7 @@ get_header();
                                             </div>
                                         </div>
                                     </article>
+                                    </a>
                                 </div>
                                 <?php
                             }
